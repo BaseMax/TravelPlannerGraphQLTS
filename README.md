@@ -972,6 +972,195 @@ subscription {
 }
 ```
 
+## GraphQL Schema
+
+```graphql
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  profilePicture: String
+  trips: [Trip!]!
+  notifications: [Notification!]!
+}
+
+type Trip {
+  id: ID!
+  destination: String!
+  dates: [String!]!
+  collaborators: [User!]!
+  activities: [Activity!]!
+  tags: [Tag!]!
+  notes: [CollaboratorNote!]!
+}
+
+type Activity {
+  id: ID!
+  name: String!
+  time: String!
+  trip: Trip!
+}
+
+type PointOfInterest {
+  id: ID!
+  name: String!
+  description: String!
+  location: Location!
+}
+
+type Location {
+  latitude: Float!
+  longitude: Float!
+}
+
+type Tag {
+  id: ID!
+  name: String!
+}
+
+type Notification {
+  id: ID!
+  message: String!
+  createdAt: String!
+}
+
+type CollaboratorNote {
+  id: ID!
+  content: String!
+  user: User!
+  trip: Trip!
+}
+
+input CreateTripInput {
+  destination: String!
+  dates: [String!]!
+}
+
+input AddActivityInput {
+  tripId: ID!
+  name: String!
+  time: String!
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  profilePicture: String
+}
+
+input UpdateTripInput {
+  tripId: ID!
+  destination: String
+  dates: [String!]
+}
+
+input UpdateActivityInput {
+  activityId: ID!
+  name: String
+  time: String
+}
+
+input CreatePOIInput {
+  name: String!
+  description: String!
+  location: LocationInput!
+}
+
+input LocationInput {
+  latitude: Float!
+  longitude: Float!
+}
+
+type Query {
+  getUser(userId: ID!): User
+  getTrip(tripId: ID!): Trip
+  getTripsByUser(userId: ID!): [Trip!]!
+  getActivity(activityId: ID!): Activity
+  searchPointsOfInterest(destination: String!): [PointOfInterest!]!
+  getCollaborators(tripId: ID!): [User!]!
+  getSharedTrips: [Trip!]!
+  getCollaboratorTrips: [Trip!]!
+  getActivitiesByTrip(tripId: ID!): [Activity!]!
+  getPOIDetails(poiId: ID!): PointOfInterest
+  searchTrips(destination: String, fromDate: String, toDate: String): [Trip!]!
+  getRecommendedTrips: [Trip!]!
+  getUserNotifications(userId: ID!): [Notification!]!
+  getCollaboratorStatus(tripId: ID!, collaboratorId: ID!): CollaboratorNote
+  getPopularDestinations: [Tag!]!
+  getTripActivitiesByDate(tripId: ID!, date: String!): [Activity!]!
+  getTripsByDateRange(fromDate: String!, toDate: String!): [Trip!]!
+  getUserStats(userId: ID!): UserStats
+  getTripsByDestination(destination: String!): [Trip!]!
+  getTripsByDate(date: String!): [Trip!]!
+  getTripsByCollaborator(collaboratorId: ID!): [Trip!]!
+  getTripsByTag(tagName: String!): [Trip!]!
+  getActivitiesByDate(date: String!): [Activity!]!
+  getUpcomingTrips: [Trip!]!
+}
+
+type Mutation {
+  signup(username: String!, email: String!, password: String!): User
+  login(username: String!, password: String!): AuthPayload
+  createTrip(input: CreateTripInput!): Trip
+  addActivity(input: AddActivityInput!): Trip
+  removeActivity(tripId: ID!, activityId: ID!): Trip
+  reorderActivity(tripId: ID!, activityId: ID!, newPosition: Int!): Trip
+  shareTrip(tripId: ID!, collaboratorId: ID!): Trip
+  unshareTrip(tripId: ID!, collaboratorId: ID!): Trip
+  updateUser(userId: ID!, input: UpdateUserInput!): User
+  updateTrip(input: UpdateTripInput!): Trip
+  updateActivity(input: UpdateActivityInput!): Activity
+  createPOI(input: CreatePOIInput!): PointOfInterest
+  deletePOI(poiId: ID!): PointOfInterest
+  addCollaborator(tripId: ID!, userId: ID!): Trip
+  removeCollaborator(tripId: ID!, collaboratorId: ID!): Trip
+  deleteUser(userId: ID!): User
+  deleteTrip(tripId: ID!): Trip
+  deleteActivity(activityId: ID!): Activity
+  acceptCollaborationInvite(tripId: ID!): Trip
+  declineCollaborationInvite(tripId: ID!): Trip
+  markNotificationAsRead(notificationId: ID!): Notification
+  createTag(tagName: String!): Tag
+  addTagToTrip(tripId: ID!, tagId: ID!): Trip
+  removeTagFromTrip(tripId: ID!, tagId: ID!): Trip
+  addCollaboratorNote(tripId: ID!, note: String!): Trip
+  editCollaboratorNote(noteId: ID!, content: String!): CollaboratorNote
+  deleteCollaboratorNote(noteId: ID!): CollaboratorNote
+}
+
+type Subscription {
+  tripUpdated(tripId: ID!): Trip
+  activityAdded(tripId: ID!): Activity
+  activityRemoved(tripId: ID!): Activity
+  collaboratorAdded(tripId: ID!): User
+  collaboratorRemoved(tripId: ID!): User
+  tripDeleted(tripId: ID!): Trip
+  activityUpdated(tripId: ID!): Activity
+  collaborationInviteReceived: CollaborationInvite
+  newPOICreated: PointOfInterest
+  collaboratorNoteAdded(tripId: ID!): CollaboratorNote
+  collaboratorNoteEdited(tripId: ID!): CollaboratorNote
+  collaboratorNoteDeleted(tripId: ID!): CollaboratorNote
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+type UserStats {
+  totalTrips: Int!
+  totalActivities: Int!
+  totalCollaborations: Int!
+}
+
+type CollaborationInvite {
+  id: ID!
+  inviter: User!
+  trip: Trip!
+}
+```
+
 ## Contributing
 
 We welcome contributions to improve this Travel Planner App! To contribute, please follow these steps:
