@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthInput } from './dto/create-auth.input';
-import { UpdateAuthInput } from './dto/update-auth.input';
+import { Injectable } from "@nestjs/common";
+import { SignupInput } from "./dto/create-auth.input";
+import { UpdateAuthInput } from "./dto/update-auth.input";
 
 @Injectable()
 export class AuthService {
-  create(createAuthInput: CreateAuthInput) {
-    return 'This action adds a new auth';
+  signup(signupInput: SignupInput) {
+    return "This action adds a new auth";
   }
 
   findAll() {
