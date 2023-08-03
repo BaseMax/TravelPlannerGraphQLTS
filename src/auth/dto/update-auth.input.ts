@@ -6,3 +6,4 @@ export class UpdateAuthInput extends PartialType(SignupInput) {
   @Field(() => Int)
   id: number;
 }
+                                                                                     
