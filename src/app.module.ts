@@ -6,6 +6,7 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { join } from "path";
 import { GraphQLError, GraphQLFormattedError } from "graphql";
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -33,6 +34,8 @@ import { GraphQLError, GraphQLFormattedError } from "graphql";
         return graphQLFormattedError;
       },
     }),
+
+    AuthModule,
   ],
   controllers: [],
   providers: [],
