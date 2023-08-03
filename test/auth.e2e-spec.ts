@@ -83,7 +83,6 @@ describe("Auth", () => {
           query: signupMutation,
           variables,
         });
-      console.log(response.body.errors);
 
       expect(response.status).toBe(200);
       expect(response.body.data).toBeNull();
@@ -109,6 +108,89 @@ describe("Auth", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data.signup).toBeTruthy();
+      expect(response.body.data.signup.name).toBe(variables.signupInput.name);
+    });
+  });
+
+  describe("login", () => {
+    const loginMutation = `mutation Login($loginInput: LoginInput!) {
+            login(loginInput: $loginInput) {
+              token
+              name
+            }
+          }`;
+    it("should give validation error", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: loginMutation,
+          variables: {
+            loginInput: {
+              email: "wrong email",
+              password: "test",
+            },
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.errors[0].message).toContain(
+        "email must be an email"
+      );
+    });
+
+    it("should give not exists user", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: loginMutation,
+          variables: {
+            loginInput: {
+              email: "notExistsUser@gmail.com",
+              password: "test",
+            },
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.errors[0].message).toBe(
+        "credentials aren't correct"
+      );
+    });
+
+    it("should give not valid password", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: loginMutation,
+          variables: {
+            loginInput: {
+              email: fakeUser.email,
+              password: "wrongPassword",
+            },
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.errors[0].message).toBe(
+        "credentials aren't correct"
+      );
+    });
+    it("should login successfully", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: loginMutation,
+          variables: {
+            loginInput: {
+              email: fakeUser.email,
+              password: fakeUser.password,
+            },
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.login.name).toBe(fakeUser.name);
+      expect(response.body.data.login.token).toBeTruthy();
     });
   });
 });
