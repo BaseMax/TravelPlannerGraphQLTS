@@ -24,16 +24,6 @@ export class AuthResolver {
     return this.authService.signup(signupInput);
   }
 
-  @Query(() => [Auth], { name: "auth" })
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Query(() => Auth, { name: "auth" })
-  findOne(@Args("id", { type: () => Int }) id: number) {
-    return this.authService.findOne(id);
-  }
-
   @Mutation(() => Auth)
   async login(@Args("loginInput") loginInput: LoginInput) {
     const existsUser = await this.userService.findByEmail(loginInput.email);
@@ -41,10 +31,5 @@ export class AuthResolver {
       throw new BadRequestException("credentials aren't correct");
     }
     return this.authService.login(existsUser, loginInput.password);
-  }
-
-  @Mutation(() => Auth)
-  removeAuth(@Args("id", { type: () => Int }) id: number) {
-    return this.authService.remove(id);
   }
 }

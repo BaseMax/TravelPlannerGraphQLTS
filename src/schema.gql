@@ -19,14 +19,12 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Query {
-  auth(id: Int!): Auth!
   user(id: Int!): User!
 }
 
 type Mutation {
   signup(SignupInput: SignupInput!): Auth!
   login(loginInput: LoginInput!): Auth!
-  removeAuth(id: Int!): Auth!
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
