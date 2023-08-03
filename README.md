@@ -134,6 +134,844 @@ Access the app in your browser at `http://localhost:3000`.
 - `collaboratorNoteEdited`: Subscribe to real-time updates when a collaborator edits their note on a trip.
 - `collaboratorNoteDeleted`: Subscribe to real-time updates when a collaborator deletes their note on a trip.
 
+Sure, here are more examples for the remaining queries, mutations, and subscriptions:
+
+## GraphQL Examples
+
+### **getCollaboratorTrips**: Get all trips where the current user is a collaborator.
+
+```graphql
+query {
+  getCollaboratorTrips {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### **getActivitiesByTrip**: Get all activities within a specific trip.
+
+```graphql
+query {
+  getActivitiesByTrip(tripId: "456") {
+    id
+    name
+    time
+  }
+}
+```
+
+### **getActivity**: Get activity details by activity ID.
+
+```graphql
+query {
+  getActivity(activityId: "789") {
+    id
+    name
+    time
+  }
+}
+```
+
+### **getPOIDetails**: Get details of a specific Point of Interest (POI).
+
+```graphql
+query {
+  getPOIDetails(poiId: "poi123") {
+    id
+    name
+    description
+    location
+  }
+}
+```
+
+### **searchTrips**: Search for trips based on destination, date range, or other criteria.
+
+```graphql
+query {
+  searchTrips(destination: "Italy", fromDate: "2023-09-01", toDate: "2023-09-30") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### **getRecommendedTrips**: Get a list of recommended trips based on the user's preferences or past trips.
+
+```graphql
+query {
+  getRecommendedTrips {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### **getUserNotifications**: Get notifications related to the user, such as trip updates, collaboration invitations, etc.
+
+```graphql
+query {
+  getUserNotifications {
+    id
+    message
+    type
+    createdAt
+  }
+}
+```
+
+### **getCollaboratorStatus**: Get the status (e.g., accepted, pending) of a collaborator on a specific trip.
+
+```graphql
+query {
+  getCollaboratorStatus(tripId: "456", collaboratorId: "user123") {
+    status
+    updatedAt
+  }
+}
+```
+
+### getCollaboratorTrips: Get all trips where the current user is a collaborator.
+
+```graphql
+query {
+  getCollaboratorTrips {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### getActivitiesByTrip: Get all activities within a specific trip.
+
+```graphql
+query {
+  getActivitiesByTrip(tripId: "456") {
+    id
+    name
+    time
+  }
+}
+```
+
+### getActivity: Get activity details by activity ID.
+
+```graphql
+query {
+  getActivity(activityId: "789") {
+    id
+    name
+    time
+  }
+}
+```
+
+### getPOIDetails: Get details of a specific Point of Interest (POI).
+
+```graphql
+query {
+  getPOIDetails(poiId: "poi123") {
+    id
+    name
+    description
+    location
+  }
+}
+```
+
+### searchTrips: Search for trips based on destination, date range, or other criteria.
+
+```graphql
+query {
+  searchTrips(destination: "Italy", fromDate: "2023-09-01", toDate: "2023-09-30") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### getRecommendedTrips: Get a list of recommended trips based on the user's preferences or past trips.
+
+```graphql
+query {
+  getRecommendedTrips {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### getUserNotifications: Get notifications related to the user, such as trip updates, collaboration invitations, etc.
+
+```graphql
+query {
+  getUserNotifications {
+    id
+    message
+    type
+    createdAt
+  }
+}
+```
+
+### getCollaboratorStatus: Get the status (e.g., accepted, pending) of a collaborator on a specific trip.
+
+```graphql
+query {
+  getCollaboratorStatus(tripId: "456", collaboratorId: "user123") {
+    status
+    updatedAt
+  }
+}
+```
+
+### getPopularDestinations: Get a list of popular destinations based on the number of trips created.
+
+```graphql
+query {
+  getPopularDestinations {
+    destination
+    tripsCount
+  }
+}
+```
+
+### getTripActivitiesByDate: Get activities of a trip for a specific date or date range.
+
+```graphql
+query {
+  getTripActivitiesByDate(tripId: "456", date: "2023-09-03") {
+    id
+    name
+    time
+  }
+}
+```
+
+### getTripsByDateRange: Get trips that fall within a specified date range.
+
+```graphql
+query {
+  getTripsByDateRange(fromDate: "2023-09-01", toDate: "2023-09-30") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### getUserStats: Get statistics related to the user's trips, such as the number of trips, activities, etc.
+
+```graphql
+query {
+  getUserStats(userId: "user123") {
+    totalTrips
+    totalActivities
+  }
+}
+```
+
+### acceptCollaborationInvite: Accept a collaboration invitation for a trip.
+
+```graphql
+mutation {
+  acceptCollaborationInvite(tripId: "456") {
+    id
+    status
+  }
+}
+```
+
+### declineCollaborationInvite: Decline a collaboration invitation for a trip.
+
+```graphql
+mutation {
+  declineCollaborationInvite(tripId: "456") {
+    id
+    status
+  }
+}
+```
+
+### createTag: Add a new tag to the system to be associated with trips.
+
+```graphql
+mutation {
+  createTag(tagName: "Beach Vacation") {
+    id
+    name
+  }
+}
+```
+
+### addTagToTrip: Associate a tag with a specific trip.
+
+```graphql
+mutation {
+  addTagToTrip(tripId: "456", tagId: "tag123") {
+    id
+    destination
+    tags {
+      id
+      name
+    }
+  }
+}
+```
+
+### removeTagFromTrip: Remove a tag association from a trip.
+
+```graphql
+mutation {
+  removeTagFromTrip(tripId: "456", tagId: "tag123") {
+    id
+    destination
+    tags {
+      id
+      name
+    }
+  }
+}
+```
+
+### tripUpdated: Subscribe to real-time updates when a trip is modified (e.g., itinerary changes, new collaborators).
+
+```graphql
+subscription {
+  tripUpdated(tripId: "456") {
+    id
+    destination
+    dates
+    collaborators {
+      id
+      username
+    }
+  }
+}
+```
+
+### activityAdded: Subscribe to real-time updates when an activity is added to a trip's itinerary.
+
+```graphql
+subscription {
+  activityAdded(tripId: "456") {
+    id
+    name
+    time
+  }
+}
+```
+
+### activityRemoved: Subscribe to real-time updates when an activity is removed from a trip's itinerary.
+
+```graphql
+subscription {
+  activityRemoved(tripId: "456") {
+    id
+    name
+  }
+}
+```
+
+### collaboratorAdded: Subscribe to real-time updates when a new collaborator is added to a trip.
+
+```graphql
+subscription {
+  collaboratorAdded(tripId: "456") {
+    id
+    username
+    email
+  }
+}
+```
+
+### collaboratorRemoved: Subscribe to real-time updates when a collaborator is removed from a trip.
+
+```graphql
+subscription {
+  collaboratorRemoved(tripId: "456") {
+    id
+    username
+  }
+}
+```
+
+### collaborationInviteReceived: Subscribe to real-time updates when the user receives a collaboration invitation.
+
+```graphql
+subscription {
+  collaborationInviteReceived {
+    id
+    inviter {
+      id
+      username
+    }
+    trip {
+      id
+      destination
+    }
+  }
+}
+```
+
+### getTripsByDestination: Get all trips with a specific destination.
+
+```graphql
+query {
+  getTripsByDestination(destination: "London") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### getTripsByDate: Get all trips that occur on a particular date.
+
+```graphql
+query {
+  getTripsByDate(date: "2023-09-15") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### getTripsByCollaborator: Get all trips where a specific user is a collaborator.
+
+```graphql
+query {
+  getTripsByCollaborator(collaboratorId: "user123") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### getTripsByTag: Get all trips that are associated with a specific tag.
+
+```graphql
+query {
+  getTripsByTag(tagName: "Adventure") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### getActivitiesByDate: Get all activities across all trips for a specific date.
+
+```graphql
+query {
+  getActivitiesByDate(date: "2023-09-03") {
+    id
+    name
+    time
+  }
+}
+```
+
+### getUpcomingTrips: Get all trips that are scheduled for the future.
+
+```graphql
+query {
+  getUpcomingTrips {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### addCollaboratorNote: Allow collaborators to add notes or comments to a specific trip.
+
+```graphql
+mutation {
+  addCollaboratorNote(tripId: "456", note: "Let's visit the Louvre museum!") {
+    id
+    notes {
+      id
+      content
+    }
+  }
+}
+```
+
+### editCollaboratorNote: Allow collaborators to edit their notes or comments on a trip.
+
+```graphql
+mutation {
+  editCollaboratorNote(noteId: "note123", content: "Don't forget to pack sunscreen!") {
+    id
+    notes {
+      id
+      content
+    }
+  }
+}
+```
+
+### deleteCollaboratorNote: Allow collaborators to delete their notes or comments on a trip.
+
+```graphql
+mutation {
+  deleteCollaboratorNote(noteId: "note123") {
+    id
+    notes {
+      id
+      content
+    }
+  }
+}
+```
+
+### tripDeleted: Subscribe to real-time updates when a trip is deleted.
+
+```graphql
+subscription {
+  tripDeleted(tripId: "456") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### collaboratorNoteAdded: Subscribe to real-time updates when a collaborator adds a note to a trip.
+
+```graphql
+subscription {
+  collaboratorNoteAdded(tripId: "456") {
+    id
+    notes {
+      id
+      content
+    }
+  }
+}
+```
+
+### collaboratorNoteEdited: Subscribe to real-time updates when a collaborator edits their note on a trip.
+
+```graphql
+subscription {
+  collaboratorNoteEdited(tripId: "456") {
+    id
+    notes {
+      id
+      content
+    }
+  }
+}
+```
+
+### collaboratorNoteDeleted: Subscribe to real-time updates when a collaborator deletes their note on a trip.
+
+```graphql
+subscription {
+  collaboratorNoteDeleted(tripId: "456") {
+    id
+    notes {
+      id
+      content
+    }
+  }
+}
+```
+
+### getActivitiesByDateRange: Get all activities across all trips for a specific date range.
+
+```graphql
+query {
+  getActivitiesByDateRange(fromDate: "2023-09-01", toDate: "2023-09-15") {
+    id
+    name
+    time
+  }
+}
+```
+
+### getUserStats: Get statistics related to the user's trips, such as the number of trips, activities, etc.
+
+```graphql
+query {
+  getUserStats(userId: "user123") {
+    totalTrips
+    totalActivities
+    totalCollaborations
+  }
+}
+```
+
+### getTripsByDate: Get all trips that occur on a particular date.
+
+```graphql
+query {
+  getTripsByDate(date: "2023-09-15") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### updateUser: Update user details, such as name, email, or profile picture.
+
+```graphql
+mutation {
+  updateUser(userId: "user123", name: "John Doe", email: "john.doe@example.com") {
+    id
+    name
+    email
+  }
+}
+```
+
+### updateTrip: Update trip details, such as destination, dates, or other information.
+
+```graphql
+mutation {
+  updateTrip(tripId: "456", destination: "Rome, Italy", dates: ["2023-10-01", "2023-10-10"]) {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### updateActivity: Update activity details, such as activity name, description, or time.
+
+```graphql
+mutation {
+  updateActivity(activityId: "789", name: "Visit Colosseum", time: "2023-10-05T09:00:00") {
+    id
+    name
+    time
+  }
+}
+```
+
+### tripUpdated: Subscribe to real-time updates when a trip is modified (e.g., itinerary changes, new collaborators).
+
+```graphql
+subscription {
+  tripUpdated(tripId: "456") {
+    id
+    destination
+    dates
+    collaborators {
+      id
+      username
+    }
+    activities {
+      id
+      name
+      time
+    }
+  }
+}
+```
+
+### activityUpdated: Subscribe to real-time updates when an activity is modified (e.g., details changed, time updated).
+
+```graphql
+subscription {
+  activityUpdated(tripId: "456") {
+    id
+    name
+    time
+  }
+}
+```
+
+### newPOICreated: Subscribe to real-time updates when a new Point of Interest (POI) is added to the database.
+
+```graphql
+subscription {
+  newPOICreated {
+    id
+    name
+    description
+    location
+  }
+}
+```
+
+### tripDeleted: Subscribe to real-time updates when a trip is deleted, notifying collaborators.
+
+```graphql
+subscription {
+  tripDeleted(tripId: "456") {
+    id
+    destination
+    dates
+  }
+}
+```
+
+### getUser: Get user details by user ID or username.
+
+```graphql
+query {
+  getUser(userId: "user123") {
+    id
+    username
+    email
+    trips {
+      id
+      destination
+      dates
+    }
+    notifications {
+      id
+      message
+      createdAt
+    }
+  }
+}
+```
+
+### getTripsByUser: Get all trips associated with a specific user.
+
+```graphql
+query {
+  getTripsByUser(userId: "user123") {
+    id
+    destination
+    dates
+    collaborators {
+      id
+      username
+    }
+    activities {
+      id
+      name
+      time
+    }
+  }
+}
+```
+
+### getActivity: Get activity details by activity ID.
+```graphql
+query {
+  getActivity(activityId: "activity456") {
+    id
+    name
+    time
+    trip {
+      id
+      destination
+      dates
+    }
+  }
+}
+```
+
+### createPOI: Add a new Point of Interest (POI) to the database.
+```graphql
+mutation {
+  createPOI(
+    name: "Louvre Museum",
+    description: "Famous art museum in Paris",
+    location: { latitude: 48.860294, longitude: 2.338629 }
+  ) {
+    id
+    name
+    description
+    location
+  }
+}
+```
+
+### deletePOI: Remove a Point of Interest (POI) from the database.
+
+```graphql
+mutation {
+  deletePOI(poiId: "poi456") {
+    id
+    name
+  }
+}
+```
+
+### addCollaborator: Invite a user to collaborate on a trip by adding them to the list of collaborators.
+
+```graphql
+mutation {
+  addCollaborator(tripId: "trip456", userId: "user789") {
+    id
+    destination
+    collaborators {
+      id
+      username
+    }
+  }
+}
+```
+
+### collaboratorAdded: Subscribe to real-time updates when a new collaborator is added to a trip.
+```graphql
+subscription {
+  collaboratorAdded(tripId: "trip456") {
+    id
+    destination
+    collaborators {
+      id
+      username
+    }
+  }
+}
+```
+
+### collaboratorRemoved: Subscribe to real-time updates when a collaborator is removed from a trip.
+
+```graphql
+subscription {
+  collaboratorRemoved(tripId: "trip456") {
+    id
+    destination
+    collaborators {
+      id
+      username
+    }
+  }
+}
+```
+
+### tripDeleted: Subscribe to real-time updates when a trip is deleted.
+
+```graphql
+subscription {
+  tripDeleted(tripId: "trip456") {
+    id
+    destination
+  }
+}
+```
+
+### activityUpdated: Subscribe to real-time updates when an activity is modified (e.g., details changed, time updated).
+
+```graphql
+subscription {
+  activityUpdated(tripId: "trip456") {
+    id
+    name
+    time
+  }
+}
+```
+
 ## Contributing
 
 We welcome contributions to improve this Travel Planner App! To contribute, please follow these steps:
