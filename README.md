@@ -59,6 +59,34 @@ npm start
 
 Access the app in your browser at `http://localhost:3000`.
 
+## GraphQL
+
+### Queries:
+
+- `getUser: Get user details by user ID or username.
+- `getTrip: Get trip details by trip ID.
+- `getTripsByUser: Get all trips associated with a specific user.
+- `searchPointsOfInterest: Search for points of interest at a specific destination.
+- `getCollaborators: Get a list of users who are collaborators on a specific trip.
+- `getSharedTrips: Get all trips that have been shared with the currently logged-in user.
+
+### Mutations:
+
+- `signup`: Create a new user account with username, email, and password.
+- `login`: Log in the user and return a JWT token for authentication.
+- `createTrip`: Create a new trip with destination, dates, and other details.
+- `addActivity`: Add an activity to a trip's itinerary.
+- `removeActivity`: Remove an activity from a trip's itinerary.
+- `reorderActivity`: Reorder activities within a trip's itinerary.
+- `shareTrip`: Share a trip with another registered user.
+- `unshareTrip`: Remove a user from the list of collaborators on a trip.
+
+### Subscriptions (Real-time Updates):
+
+- `tripUpdated`: Subscribe to real-time updates when a trip is modified (e.g., itinerary changes, new collaborators).
+- `activityAdded`: Subscribe to real-time updates when an activity is added to a trip's itinerary.
+- `activityRemoved`: Subscribe to real-time updates when an activity is removed from a trip's itinerary.
+
 ## Contributing
 
 We welcome contributions to improve this Travel Planner App! To contribute, please follow these steps:
