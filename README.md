@@ -75,6 +75,12 @@ Access the app in your browser at `http://localhost:3000`.
 - `getPOIDetails`: Get details of a specific Point of Interest (POI).
 - `searchTrips`: Search for trips based on destination, date range, or other criteria.
 - `getRecommendedTrips`: Get a list of recommended trips based on the user's preferences or past trips.
+- `getUserNotifications`: Get notifications related to the user, such as trip updates, collaboration invitations, etc.
+- `getCollaboratorStatus`: Get the status (e.g., accepted, pending) of a collaborator on a specific trip.
+- `getPopularDestinations`: Get a list of popular destinations based on the number of trips created.
+- `getTripActivitiesByDate`: Get activities of a trip for a specific date or date range.
+- `getTripsByDateRange`: Get trips that fall within a specified date range.
+- `getUserStats`: Get statistics related to the user's trips, such as the number of trips, activities, etc.
 
 ### Mutations:
 
@@ -93,6 +99,12 @@ Access the app in your browser at `http://localhost:3000`.
 - `deletePOI`: Remove a Point of Interest (POI) from the database.
 - `addCollaborator`: Invite a user to collaborate on a trip by adding them to the list of collaborators.
 - `removeCollaborator`: Remove a collaborator from a trip.
+- `deleteUser`: Delete the user account along with all associated data (trips, activities, etc.).
+- `deleteTrip`: Delete a trip along with its itinerary and associated data.
+- `deleteActivity`: Delete an activity from the database.
+- `acceptCollaborationInvite`: Accept a collaboration invitation for a trip.
+- `declineCollaborationInvite`: Decline a collaboration invitation for a trip.
+- `markNotificationAsRead`: Mark a notification as read once the user has viewed it.
 
 ### Subscriptions (Real-time Updates):
 
@@ -103,6 +115,9 @@ Access the app in your browser at `http://localhost:3000`.
 - `collaboratorRemoved`: Subscribe to real-time updates when a collaborator is removed from a trip.
 - `tripDeleted`: Subscribe to real-time updates when a trip is deleted.
 - `activityUpdated`: Subscribe to real-time updates when an activity is modified (e.g., details changed, time updated).
+- `collaborationInviteReceived`: Subscribe to real-time updates when the user receives a collaboration invitation.
+- ``: Subscribe to real-time updates when a new Point of Interest (POI) is added to the database.
+- `tripDeleted`: Subscribe to real-time updates when a trip is deleted, notifying collaborators.
 
 ## Contributing
 
