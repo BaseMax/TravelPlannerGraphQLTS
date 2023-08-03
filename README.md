@@ -81,6 +81,12 @@ Access the app in your browser at `http://localhost:3000`.
 - `getTripActivitiesByDate`: Get activities of a trip for a specific date or date range.
 - `getTripsByDateRange`: Get trips that fall within a specified date range.
 - `getUserStats`: Get statistics related to the user's trips, such as the number of trips, activities, etc.
+- `getTripsByDestination`: Get all trips with a specific destination.
+- `getTripsByDate`: Get all trips that occur on a particular date.
+- `getTripsByCollaborator`: Get all trips where a specific user is a collaborator.
+- `getTripsByTag`: Get all trips that are associated with a specific tag (e.g., "Adventure," "Beach Vacation," "Hiking").
+- `getActivitiesByDate`: Get all activities across all trips for a specific date.
+- `getUpcomingTrips`: Get all trips that are scheduled for the future.
 
 ### Mutations:
 
@@ -105,6 +111,12 @@ Access the app in your browser at `http://localhost:3000`.
 - `acceptCollaborationInvite`: Accept a collaboration invitation for a trip.
 - `declineCollaborationInvite`: Decline a collaboration invitation for a trip.
 - `markNotificationAsRead`: Mark a notification as read once the user has viewed it.
+- `createTag`: Add a new tag to the system to be associated with trips.
+- `addTagToTrip`: Associate a tag with a specific trip.
+- `removeTagFromTrip`: Remove a tag association from a trip.
+- `addCollaboratorNote`: Allow collaborators to add notes or comments to a specific trip.
+- `editCollaboratorNote`: Allow collaborators to edit their notes or comments on a trip.
+- `deleteCollaboratorNote`: Allow collaborators to delete their notes or comments on a trip.
 
 ### Subscriptions (Real-time Updates):
 
@@ -116,8 +128,11 @@ Access the app in your browser at `http://localhost:3000`.
 - `tripDeleted`: Subscribe to real-time updates when a trip is deleted.
 - `activityUpdated`: Subscribe to real-time updates when an activity is modified (e.g., details changed, time updated).
 - `collaborationInviteReceived`: Subscribe to real-time updates when the user receives a collaboration invitation.
-- ``: Subscribe to real-time updates when a new Point of Interest (POI) is added to the database.
+- `newPOICreated`: Subscribe to real-time updates when a new Point of Interest (POI) is added to the database.
 - `tripDeleted`: Subscribe to real-time updates when a trip is deleted, notifying collaborators.
+- `collaboratorNoteAdded`: Subscribe to real-time updates when a collaborator adds a note to a trip.
+- `collaboratorNoteEdited`: Subscribe to real-time updates when a collaborator edits their note on a trip.
+- `collaboratorNoteDeleted`: Subscribe to real-time updates when a collaborator deletes their note on a trip.
 
 ## Contributing
 
