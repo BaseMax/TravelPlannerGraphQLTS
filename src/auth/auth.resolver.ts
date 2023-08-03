@@ -1,8 +1,8 @@
 import { Resolver, Query, Mutation, Args, Int } from "@nestjs/graphql";
 import { AuthService } from "./auth.service";
 import { Auth } from "./entities/auth.entity";
-import { SignupInput } from "./dto/create-auth.input";
-import { UpdateAuthInput } from "./dto/update-auth.input";
+import { SignupInput } from "./dto/signup.input";
+import { LoginInput } from "./dto/login.input";
 import { UserService } from "src/user/user.service";
 import { BadRequestException } from "@nestjs/common";
 
@@ -35,8 +35,12 @@ export class AuthResolver {
   }
 
   @Mutation(() => Auth)
-  updateAuth(@Args("updateAuthInput") updateAuthInput: UpdateAuthInput) {
-    return this.authService.update(updateAuthInput.id, updateAuthInput);
+  async login(@Args("loginInput") loginInput: LoginInput) {
+    const existsUser = await this.userService.findByEmail(loginInput.email);
+    if (!existsUser) {
+      throw new BadRequestException("credentials aren't correct");
+    }
+    return this.authService.login(existsUser, loginInput.password);
   }
 
   @Mutation(() => Auth)
