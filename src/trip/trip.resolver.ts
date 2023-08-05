@@ -26,6 +26,12 @@ export class TripResolver {
     return this.tripService.findByIdOrThrow(id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Query(() => [Trip], { name: "userTrips" })
+  getUserTrips(@GerCurrentUserId() userId: string) {
+    return this.tripService.getUserTrips(userId);
+  }
+
   @Mutation(() => Trip)
   updateTrip(@Args("updateTripInput") updateTripInput: UpdateTripInput) {
     return this.tripService.update(updateTripInput.id, updateTripInput);
