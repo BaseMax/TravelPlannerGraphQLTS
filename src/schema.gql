@@ -27,7 +27,7 @@ type Trip {
 
 type Query {
   user(id: Int!): User!
-  trip(id: Int!): Trip!
+  trip(id: String!): Trip!
 }
 
 type Mutation {

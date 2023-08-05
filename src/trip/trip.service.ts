@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateTripInput } from "./dto/create-trip.input";
 import { UpdateTripInput } from "./dto/update-trip.input";
 import { InjectModel } from "@nestjs/mongoose";
@@ -23,8 +23,12 @@ export class TripService {
     return `This action returns all trip`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} trip`;
+  async findByIdOrThrow(id: string): Promise<TripDocument> {
+    const trip = await this.tripModel.findById(id);
+    if (!trip) {
+      throw new BadRequestException("trip with this id doesn't exist");
+    }
+    return trip;
   }
 
   update(id: number, updateTripInput: UpdateTripInput) {

@@ -6,6 +6,8 @@ import { UpdateTripInput } from "./dto/update-trip.input";
 import { UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guards/jwt.auth.guard";
 import { GerCurrentUserId } from "src/common/get.current.userId";
+import { IsMongoId } from "class-validator";
+import { ParseObjectIdPipe } from "src/common/pipes/objectId.pipe";
 @Resolver(() => Trip)
 export class TripResolver {
   constructor(private readonly tripService: TripService) {}
@@ -16,18 +18,12 @@ export class TripResolver {
     @Args("createTripInput") createTripInput: CreateTripInput,
     @GerCurrentUserId() userId: string
   ) {
-    
     return this.tripService.create(createTripInput, userId);
   }
 
-  @Query(() => [Trip], { name: "trip" })
-  findAll() {
-    return this.tripService.findAll();
-  }
-
   @Query(() => Trip, { name: "trip" })
-  findOne(@Args("id", { type: () => Int }) id: number) {
-    return this.tripService.findOne(id);
+  findOne(@Args("id", ParseObjectIdPipe) id: string) {
+    return this.tripService.findByIdOrThrow(id);
   }
 
   @Mutation(() => Trip)
