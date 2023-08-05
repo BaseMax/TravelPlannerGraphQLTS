@@ -18,8 +18,16 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Trip {
+  _id: String!
+  destination: String!
+  dates: [DateTime!]!
+  calibrators: [String!]!
+}
+
 type Query {
   user(id: Int!): User!
+  trip(id: Int!): Trip!
 }
 
 type Mutation {
@@ -28,6 +36,9 @@ type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
+  createTrip(createTripInput: CreateTripInput!): Trip!
+  updateTrip(updateTripInput: UpdateTripInput!): Trip!
+  removeTrip(id: Int!): Trip!
 }
 
 input SignupInput {
@@ -54,5 +65,18 @@ input UpdateUserInput {
   email: String
   password: String
   confirmPassword: String
+  id: Int!
+}
+
+input CreateTripInput {
+  destination: String!
+  dates: [DateTime!]!
+  calibrators: [String!]
+}
+
+input UpdateTripInput {
+  destination: String
+  dates: [DateTime!]
+  calibrators: [String!]
   id: Int!
 }

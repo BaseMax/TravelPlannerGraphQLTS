@@ -1,11 +1,22 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTripInput } from './dto/create-trip.input';
-import { UpdateTripInput } from './dto/update-trip.input';
+import { Injectable } from "@nestjs/common";
+import { CreateTripInput } from "./dto/create-trip.input";
+import { UpdateTripInput } from "./dto/update-trip.input";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { TripDocument } from "./interfaces/trip.document";
 
 @Injectable()
 export class TripService {
-  create(createTripInput: CreateTripInput) {
-    return 'This action adds a new trip';
+  constructor(@InjectModel("Trip") private tripModel: Model<TripDocument>) {}
+
+  async create(
+    createTripInput: CreateTripInput,
+    userId: string
+  ): Promise<TripDocument> {
+    return await this.tripModel.create({
+      ...createTripInput,
+      calibrators: userId,
+    });
   }
 
   findAll() {
