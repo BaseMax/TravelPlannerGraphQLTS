@@ -262,6 +262,64 @@ describe("Trip", () => {
       expect(_id).toBe(trip._id.toString());
       expect(calibrators.length).toBeGreaterThanOrEqual(1);
     });
+    it("should get validation error for get collaborators", async () => {
+      const getCollaborators = `query Query($collaboratorsInTripId: String!) {
+        collaboratorsInTrip(id: $collaboratorsInTripId)
+      }`;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: getCollaborators,
+          variables: {
+            collaboratorsInTripId: "12O1JQDSAKD2NA",
+          },
+        });
+
+      expect(response.status).toBe(200);
+
+      expect(response.body.errors[0].message).toContain(
+        "id must be a valid objectId"
+      );
+    });
+    it("should get not found for getting  collaborators", async () => {
+      const getCollaborators = `query Query($collaboratorsInTripId: String!) {
+        collaboratorsInTrip(id: $collaboratorsInTripId)
+      }`;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: getCollaborators,
+          variables: {
+            collaboratorsInTripId: "64cdde0c580b92480b8fe8b1",
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.errors[0].message).toBe(
+        "trip with this id doesn't exist"
+      );
+    });
+    it("should get a specific trip's collaborators", async () => {
+      const getCollaborators = `query Query($collaboratorsInTripId: String!) {
+        collaboratorsInTrip(id: $collaboratorsInTripId)
+      }`;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: getCollaborators,
+          variables: {
+            collaboratorsInTripId: trip._id.toString(),
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(
+        response.body.data.collaboratorsInTrip.length
+      ).toBeGreaterThanOrEqual(0);
+    });
   });
 
   describe("get trips associate with", () => {
