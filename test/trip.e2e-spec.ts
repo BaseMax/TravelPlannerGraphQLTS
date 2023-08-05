@@ -1,5 +1,5 @@
 import { INestApplication, ValidationPipe } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test } from "@nestjs/testing";
 import { Model, model } from "mongoose";
 import { AppModule } from "src/app.module";
@@ -9,8 +9,13 @@ import { getFakeUser } from "./fakeData/user.fake";
 import { getModelToken } from "@nestjs/mongoose";
 import * as argon2 from "argon2";
 import { TripDocument } from "src/trip/interfaces/trip.document";
+import { JwtService } from "@nestjs/jwt";
+import { CreateTripInput } from "src/trip/dto/create-trip.input";
+import { getFakeTrips } from "./fakeData/trip.fake";
+import { JwtPayload } from "src/auth/interfaces/jwt.payload";
 describe("Trip", () => {
   let app: INestApplication;
+  let jwtService: JwtService;
   let fakeUser: User;
   let tripModel: Model<any>;
   let userModel: Model<any>;
@@ -70,7 +75,10 @@ describe("Trip", () => {
       imports: [AppModule, ConfigModule.forRoot()],
     }).compile();
 
+    const configService = new ConfigService();
     app = moduleRef.createNestApplication();
+    jwtService = new JwtService({ secret: configService.get("SECRET_KEY") });
+
     tripModel = app.get<Model<any>>(getModelToken("Trip"));
 
     userModel = app.get<Model<any>>(getModelToken("User"));
@@ -253,6 +261,57 @@ describe("Trip", () => {
       expect(destination).toBe(trip.destination);
       expect(_id).toBe(trip._id.toString());
       expect(calibrators.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe("get trips associate with", () => {
+    let token: string;
+    let userId: string;
+    let fakeTrips: CreateTripInput[];
+    beforeAll(async () => {
+      token = await login();
+      const { sub } = jwtService.decode(token);
+      userId = sub;
+      fakeTrips = getFakeTrips(userId);
+      await tripModel.insertMany(fakeTrips);
+    });
+
+    const getUserTripsQuery = `query UserTrips {
+      userTrips {
+        _id
+        destination
+        dates
+        calibrators
+      }
+    }`;
+
+    it("should give authentication error", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: getUserTripsQuery,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+      expect(response.body.errors[0].message).toBe(
+        "you must login to get this feather"
+      );
+    });
+
+    it("should get user trips", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: getUserTripsQuery,
+        });
+
+      const calibratorsId = response.body.data.userTrips[0].calibrators;
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.userTrips.length).toBeGreaterThanOrEqual(4);
+      expect(calibratorsId).toContain(userId);
     });
   });
 });
