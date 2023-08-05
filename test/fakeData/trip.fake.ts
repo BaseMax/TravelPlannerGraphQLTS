@@ -9,7 +9,7 @@ export function getFakeTrips(userId: string): CreateTripInput[] {
         new Date("Sat Aug 05 2023 06:34:25 GMT+0330"),
         new Date("Sat dec 07 2023 06:34:25 GMT+0330 "),
       ],
-      calibrators: ["64cdde0c580b92480b8fe8b0", `${userId}`],
+      collaborators: ["64cdde0c580b92480b8fe8b0", `${userId}`],
     },
     {
       destination: "Germany",
@@ -17,7 +17,7 @@ export function getFakeTrips(userId: string): CreateTripInput[] {
         new Date("Sat june 05 2023 06:34:25 GMT+0330"),
         new Date("Sat june 07 2023 06:34:25 GMT+0330 "),
       ],
-      calibrators: [`${userId}`],
+      collaborators: [`${userId}`],
     },
 
     {
@@ -26,7 +26,7 @@ export function getFakeTrips(userId: string): CreateTripInput[] {
         new Date("Sat april 05 2023 06:34:25 GMT+0330"),
         new Date("Sat march  07 2023 06:34:25 GMT+0330 "),
       ],
-      calibrators: [`${userId}`],
+      collaborators: [`${userId}`],
     },
     {
       destination: "Sweden",
@@ -34,7 +34,7 @@ export function getFakeTrips(userId: string): CreateTripInput[] {
         new Date("Sat july 05 2023 06:34:25 GMT+0330"),
         new Date("Sat february 07 2023 06:34:25 GMT+0330 "),
       ],
-      calibrators: [`${userId}`],
+      collaborators: [`${userId}`],
     },
     {
       destination: "Australia",
@@ -42,7 +42,7 @@ export function getFakeTrips(userId: string): CreateTripInput[] {
         new Date("Sat Aug 05 2023 06:34:25 GMT+0330"),
         new Date("Sat dec 07 2023 06:34:25 GMT+0330 "),
       ],
-      calibrators: ["64cdde0c580b92480b8fe8b0"],
+      collaborators: ["64cdde0c580b92480b8fe8b0"],
     },
   ];
 }

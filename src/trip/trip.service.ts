@@ -15,7 +15,7 @@ export class TripService {
   ): Promise<TripDocument> {
     return await this.tripModel.create({
       ...createTripInput,
-      calibrators: userId,
+      collaborators: userId,
     });
   }
 
@@ -33,7 +33,7 @@ export class TripService {
 
   async getUserTrips(userId: string): Promise<TripDocument[]> {
     return await this.tripModel.find({
-      calibrators: new mongoose.Types.ObjectId(userId),
+      collaborators: new mongoose.Types.ObjectId(userId),
     });
   }
   update(id: number, updateTripInput: UpdateTripInput) {

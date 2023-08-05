@@ -18,5 +18,5 @@ export class CreateTripInput {
   @Field(() => [String], { nullable: true })
   @IsArrayOfMongoId()
   @IsOptional()
-  calibrators: string[];
+  collaborators: string[];
 }

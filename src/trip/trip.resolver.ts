@@ -42,7 +42,7 @@ export class TripResolver {
   @Query(() => [String], { name: "collaboratorsInTrip" })
   async getCollaboratorsInTrip(@Args("id", ParseObjectIdPipe) id: string) {
     const trip = await this.tripService.findByIdOrThrow(id);
-    return trip.calibrators;
+    return trip.collaborators;;
   }
 
   @Mutation(() => Trip)

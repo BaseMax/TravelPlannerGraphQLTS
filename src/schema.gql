@@ -22,7 +22,7 @@ type Trip {
   _id: String!
   destination: String!
   dates: [DateTime!]!
-  calibrators: [String!]!
+  collaborators: [String!]!
 }
 
 type Query {
@@ -73,12 +73,12 @@ input UpdateUserInput {
 input CreateTripInput {
   destination: String!
   dates: [DateTime!]!
-  calibrators: [String!]
+  collaborators: [String!]
 }
 
 input UpdateTripInput {
   destination: String
   dates: [DateTime!]
-  calibrators: [String!]
+  collaborators: [String!]
   id: Int!
 }

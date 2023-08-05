@@ -27,6 +27,6 @@ export class Trip {
       },
     ],
   })
-  calibrators: string[];
+  collaborators: string[];
 }
 export const TripSchema = SchemaFactory.createForClass(Trip);

@@ -48,7 +48,7 @@ describe("Trip", () => {
       _id
       destination
       dates
-      calibrators
+      collaborators
     }
   }`;
 
@@ -113,7 +113,7 @@ describe("Trip", () => {
           _id
           destination
           dates
-          calibrators
+          collaborators
         }
       }`;
     it("should give authentication error", async () => {
@@ -125,7 +125,7 @@ describe("Trip", () => {
             createTripInput: {
               destination: "France",
               dates: ["2022-10-2", "2022-12-0"],
-              calibrators: [""],
+              collaborators: [""],
             },
           },
         });
@@ -146,7 +146,7 @@ describe("Trip", () => {
             createTripInput: {
               destination: "France",
               dates: ["2022-10-2", "2022-12-0"],
-              calibrators: [""],
+              collaborators: [""],
             },
           },
         });
@@ -156,7 +156,7 @@ describe("Trip", () => {
         "dates must be an array of valid dates."
       );
       expect(response.body.errors[0].message).toContain(
-        "calibrators must be an array of valid MongoDB ObjectIDs"
+        "collaborators must be an array of valid MongoDB ObjectIDs"
       );
     });
 
@@ -197,7 +197,7 @@ describe("Trip", () => {
           _id
           destination
           dates
-          calibrators
+          collaborators
         }
       }`;
       const response = await request(app.getHttpServer())
@@ -220,7 +220,7 @@ describe("Trip", () => {
           _id
           destination
           dates
-          calibrators
+          collaborators
         }
       }`;
       const response = await request(app.getHttpServer())
@@ -243,7 +243,7 @@ describe("Trip", () => {
           _id
           destination
           dates
-          calibrators
+          collaborators
         }
       }`;
       const response = await request(app.getHttpServer())
@@ -255,12 +255,12 @@ describe("Trip", () => {
           },
         });
 
-      const { _id, destination, calibrators } = response.body.data.trip;
+      const { _id, destination, collaborators } = response.body.data.trip;
 
       expect(response.status).toBe(200);
       expect(destination).toBe(trip.destination);
       expect(_id).toBe(trip._id.toString());
-      expect(calibrators.length).toBeGreaterThanOrEqual(1);
+      expect(collaborators.length).toBeGreaterThanOrEqual(1);
     });
     it("should get validation error for get collaborators", async () => {
       const getCollaborators = `query Query($collaboratorsInTripId: String!) {
@@ -339,7 +339,7 @@ describe("Trip", () => {
         _id
         destination
         dates
-        calibrators
+        collaborators
       }
     }`;
 
@@ -365,11 +365,11 @@ describe("Trip", () => {
           query: getUserTripsQuery,
         });
 
-      const calibratorsId = response.body.data.userTrips[0].calibrators;
+      const collaboratorsId = response.body.data.userTrips[0].collaborators;
 
       expect(response.status).toBe(200);
       expect(response.body.data.userTrips.length).toBeGreaterThanOrEqual(4);
-      expect(calibratorsId).toContain(userId);
+      expect(collaboratorsId).toContain(userId);
     });
   });
 });

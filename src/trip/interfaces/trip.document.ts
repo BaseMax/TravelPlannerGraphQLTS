@@ -5,5 +5,5 @@ export interface TripDocument extends Document {
 
   readonly dates: Date[];
 
-  readonly calibrators: string[];
+  readonly collaborators: string[];
 }
