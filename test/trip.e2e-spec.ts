@@ -8,6 +8,7 @@ import * as request from "supertest";
 import { getFakeUser } from "./fakeData/user.fake";
 import { getModelToken } from "@nestjs/mongoose";
 import * as argon2 from "argon2";
+import { TripDocument } from "src/trip/interfaces/trip.document";
 describe("Trip", () => {
   let app: INestApplication;
   let fakeUser: User;
@@ -36,7 +37,34 @@ describe("Trip", () => {
 
     return response.body.data.login.token as string;
   }
+  async function createTrip(token: string): Promise<TripDocument> {
+    const createTripMutation = `mutation CreateTrip($createTripInput: CreateTripInput!) {
+    createTrip(createTripInput: $createTripInput) {
+      _id
+      destination
+      dates
+      calibrators
+    }
+  }`;
 
+    const response = await request(app.getHttpServer())
+      .post("/graphql")
+      .set("authorization", token)
+      .send({
+        query: createTripMutation,
+        variables: {
+          createTripInput: {
+            destination: "France",
+            dates: [
+              "Sat Aug 05 2023 06:34:25 GMT+0330",
+              "Sat dec 07 2023 06:34:25 GMT+0330 ",
+            ],
+          },
+        },
+      });
+
+    return response.body.data.createTrip;
+  }
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, ConfigModule.forRoot()],
@@ -144,6 +172,87 @@ describe("Trip", () => {
       expect(response.status).toBe(200);
       expect(response.body.errors).toBeUndefined();
       expect(response.body.data.createTrip.destination).toBe("France");
+    });
+  });
+
+  describe("get a specific tripe by Id", () => {
+    let trip: TripDocument;
+    let token: string;
+
+    beforeAll(async () => {
+      token = await login();
+      trip = await createTrip(token);
+    });
+    it("should get validation error", async () => {
+      const findOneQuery = `query Trip($tripId: String!) {
+        trip(id: $tripId) {
+          _id
+          destination
+          dates
+          calibrators
+        }
+      }`;
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: findOneQuery,
+          variables: {
+            tripId: "121212",
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.errors[0].message).toContain(
+        "id must be a valid objectId"
+      );
+    });
+    it("should get not found error", async () => {
+      const findOneQuery = `query Trip($tripId: String!) {
+        trip(id: $tripId) {
+          _id
+          destination
+          dates
+          calibrators
+        }
+      }`;
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: findOneQuery,
+          variables: {
+            tripId: "64cdde0c580b92480b8fe8b1",
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.errors[0].message).toBe(
+        "trip with this id doesn't exist"
+      );
+    });
+    it("should get the trip", async () => {
+      const findOneQuery = `query Trip($tripId: String!) {
+        trip(id: $tripId) {
+          _id
+          destination
+          dates
+          calibrators
+        }
+      }`;
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: findOneQuery,
+          variables: {
+            tripId: trip._id.toString(),
+          },
+        });
+
+      const { _id, destination, calibrators } = response.body.data.trip;
+
+      expect(response.status).toBe(200);
+      expect(destination).toBe(trip.destination);
+      expect(_id).toBe(trip._id.toString());
+      expect(calibrators.length).toBeGreaterThanOrEqual(1);
     });
   });
 });
