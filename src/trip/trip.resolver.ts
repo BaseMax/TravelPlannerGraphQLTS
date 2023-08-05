@@ -1,4 +1,11 @@
-import { Resolver, Query, Mutation, Args, Int } from "@nestjs/graphql";
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+} from "@nestjs/graphql";
 import { TripService } from "./trip.service";
 import { Trip } from "./entities/trip.entity";
 import { CreateTripInput } from "./dto/create-trip.input";
@@ -30,6 +37,12 @@ export class TripResolver {
   @Query(() => [Trip], { name: "userTrips" })
   getUserTrips(@GerCurrentUserId() userId: string) {
     return this.tripService.getUserTrips(userId);
+  }
+
+  @Query(() => [String], { name: "collaboratorsInTrip" })
+  async getCollaboratorsInTrip(@Args("id", ParseObjectIdPipe) id: string) {
+    const trip = await this.tripService.findByIdOrThrow(id);
+    return trip.calibrators;
   }
 
   @Mutation(() => Trip)

@@ -29,6 +29,7 @@ type Query {
   user(id: Int!): User!
   trip(id: String!): Trip!
   userTrips: [Trip!]!
+  collaboratorsInTrip(id: String!): [String!]!
 }
 
 type Mutation {
