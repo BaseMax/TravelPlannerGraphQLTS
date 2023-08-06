@@ -31,4 +31,12 @@ export class Trip {
   })
   collaborators: string[];
 }
+
+@ObjectType()
+export class PopularDestination {
+  @Field(() => Int)
+  tripsCount: number;
+  @Field()
+  destination: string;
+}
 export const TripSchema = SchemaFactory.createForClass(Trip);

@@ -7,7 +7,7 @@ import {
   ResolveField,
 } from "@nestjs/graphql";
 import { TripService } from "./trip.service";
-import { Trip } from "./entities/trip.entity";
+import { PopularDestination, Trip } from "./entities/trip.entity";
 import { CreateTripInput } from "./dto/create-trip.input";
 import { UpdateTripInput } from "./dto/update-trip.input";
 import { UseGuards } from "@nestjs/common";
@@ -49,6 +49,11 @@ export class TripResolver {
   @Query(() => [Trip], { name: "searchTrip" })
   async search(@Args("searchInput") searchTripInput: SearchTripInput) {
     return this.tripService.search(searchTripInput);
+  }
+
+  @Query(() => [PopularDestination], { name: "PopularDestination" })
+  async getPopularDestination() {
+    return this.tripService.getPopularDestination();
   }
 
   @Mutation(() => Trip)

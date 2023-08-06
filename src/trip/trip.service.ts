@@ -5,6 +5,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { TripDocument } from "./interfaces/trip.document";
 import { SearchTripInput } from "./dto/search-trip.input";
+import { PopularDestination } from "./entities/trip.entity";
 
 @Injectable()
 export class TripService {
@@ -49,6 +50,32 @@ export class TripService {
         $match: filters,
       },
     ]);
+  }
+  //
+  async getPopularDestination(): Promise<PopularDestination[]> {
+    const aggregationResult = await this.tripModel.aggregate([
+      {
+        $group: {
+          _id: "$destination",
+          tripsCount: { $count: {} },
+        },
+      },
+      {
+        $sort: {
+          tripsCount: -1,
+        },
+      },
+    ]);
+    const popularDestinations: PopularDestination[] = aggregationResult.map(
+      (destination) => {
+        return {
+          destination: destination._id,
+          tripsCount: destination.tripsCount,
+        };
+      }
+    );
+
+    return popularDestinations;
   }
 
   async getUserTrips(userId: string): Promise<TripDocument[]> {

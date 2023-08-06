@@ -26,12 +26,18 @@ type Trip {
   collaborators: [String!]!
 }
 
+type PopularDestination {
+  tripsCount: Int!
+  destination: String!
+}
+
 type Query {
   user(id: Int!): User!
   trip(id: String!): Trip!
   userTrips: [Trip!]!
   collaboratorsInTrip(id: String!): [String!]!
   searchTrip(searchInput: SearchTripInput!): [Trip!]!
+  PopularDestination: [PopularDestination!]!
 }
 
 input SearchTripInput {
