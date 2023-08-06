@@ -449,5 +449,29 @@ describe("Trip", () => {
         new Date("2024-12-07T03:04:25.000+00:00").getTime()
       );
     });
+
+    it("should get popular destination", async () => {
+      const getPopularDestinationQuery = `query PopularDestination {
+            PopularDestination {
+              tripsCount
+              destination
+            }
+          }`;
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: getPopularDestinationQuery,
+        });
+
+      const mostPopularDestination = response.body.data.PopularDestination[0];
+      const secondMostPopularDestination =
+        response.body.data.PopularDestination[1];
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.PopularDestination).toBeDefined();
+      expect(mostPopularDestination.tripsCount).toBeGreaterThanOrEqual(
+        secondMostPopularDestination.tripsCount
+      );
+    });
   });
 });
