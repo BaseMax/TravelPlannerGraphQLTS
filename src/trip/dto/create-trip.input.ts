@@ -1,8 +1,8 @@
 import { InputType, Int, Field } from "@nestjs/graphql";
-import { IsOptional, IsString } from "class-validator";
+import { IsDate, IsOptional, IsString, Validate } from "class-validator";
 import {
-  IsArrayOfDates,
   IsArrayOfMongoId,
+  IsValidDates,
 } from "../decorators/validation.decorators";
 
 @InputType()
@@ -11,9 +11,14 @@ export class CreateTripInput {
   @IsString()
   destination: string;
 
-  @Field(() => [Date])
-  @IsArrayOfDates()
-  dates: Date[];
+  @Field(() => Date)
+  @IsDate({ message: "date must have a valid form" })
+  fromDate: Date;
+
+  @Field(() => Date)
+  @IsDate({ message: "date must have a valid form" })
+  @Validate(IsValidDates, ["fromDate"])
+  toDate: Date;
 
   @Field(() => [String], { nullable: true })
   @IsArrayOfMongoId()

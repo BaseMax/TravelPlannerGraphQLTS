@@ -21,7 +21,8 @@ scalar DateTime
 type Trip {
   _id: String!
   destination: String!
-  dates: [DateTime!]!
+  fromDate: DateTime!
+  toDate: DateTime!
   collaborators: [String!]!
 }
 
@@ -72,13 +73,15 @@ input UpdateUserInput {
 
 input CreateTripInput {
   destination: String!
-  dates: [DateTime!]!
+  fromDate: DateTime!
+  toDate: DateTime!
   collaborators: [String!]
 }
 
 input UpdateTripInput {
   destination: String
-  dates: [DateTime!]
+  fromDate: DateTime
+  toDate: DateTime
   collaborators: [String!]
   id: Int!
 }

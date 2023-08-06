@@ -12,11 +12,13 @@ export class Trip {
   @Prop({ type: String, required: true })
   destination: string;
 
-  @Field(() => [Date])
-  @Prop({
-    type: [{ type: Date, required: true }],
-  })
-  dates: Date[];
+  @Field(() => Date)
+  @Prop({ type: Date, required: true })
+  fromDate: Date;
+
+  @Field(() => Date)
+  @Prop({ type: Date, required: true })
+  toDate: Date;
 
   @Field(() => [String])
   @Prop({
