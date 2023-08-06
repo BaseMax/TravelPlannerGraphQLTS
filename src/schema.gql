@@ -31,6 +31,13 @@ type Query {
   trip(id: String!): Trip!
   userTrips: [Trip!]!
   collaboratorsInTrip(id: String!): [String!]!
+  searchTrip(searchInput: SearchTripInput!): [Trip!]!
+}
+
+input SearchTripInput {
+  destination: String
+  fromDate: DateTime
+  toDate: DateTime
 }
 
 type Mutation {
