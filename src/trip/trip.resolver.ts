@@ -51,6 +51,13 @@ export class TripResolver {
     return this.tripService.search(searchTripInput);
   }
 
+  @Query(() => [Trip])
+  async getTripsByDateRange(
+    @Args("dateRange") dateRangeInput: SearchTripInput
+  ) {
+    return this.tripService.search(dateRangeInput);
+  } 
+
   @Query(() => [PopularDestination], { name: "PopularDestination" })
   async getPopularDestination() {
     return this.tripService.getPopularDestination();

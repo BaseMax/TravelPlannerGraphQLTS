@@ -37,6 +37,7 @@ type Query {
   userTrips: [Trip!]!
   collaboratorsInTrip(id: String!): [String!]!
   searchTrip(searchInput: SearchTripInput!): [Trip!]!
+  getTripsByDateRange(dateRange: SearchTripInput!): [Trip!]!
   PopularDestination: [PopularDestination!]!
 }
 
