@@ -328,7 +328,7 @@ describe("Trip", () => {
     });
   });
 
-  describe("search trips", () => {
+  describe("e2e test on inserted trips", () => {
     let token: string;
     let userId: string;
     let fakeTrips: CreateTripInput[];
@@ -349,36 +349,39 @@ describe("Trip", () => {
       }
     }`;
 
-    it("should give authentication error", async () => {
-      const response = await request(app.getHttpServer())
-        .post("/graphql")
-        .send({
-          query: getUserTripsQuery,
-        });
+    describe("search based user", () => {
+      it("should give authentication error", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .send({
+            query: getUserTripsQuery,
+          });
 
-      expect(response.status).toBe(200);
-      expect(response.body.date).toBeUndefined();
-      expect(response.body.errors[0].message).toBe(
-        "you must login to get this feather"
-      );
+        expect(response.status).toBe(200);
+        expect(response.body.date).toBeUndefined();
+        expect(response.body.errors[0].message).toBe(
+          "you must login to get this feather"
+        );
+      });
+
+      it("should get user trips", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .set("authorization", token)
+          .send({
+            query: getUserTripsQuery,
+          });
+
+        const collaboratorsId = response.body.data.userTrips[0].collaborators;
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.userTrips.length).toBeGreaterThanOrEqual(4);
+        expect(collaboratorsId).toContain(userId);
+      });
     });
 
-    it("should get user trips", async () => {
-      const response = await request(app.getHttpServer())
-        .post("/graphql")
-        .set("authorization", token)
-        .send({
-          query: getUserTripsQuery,
-        });
-
-      const collaboratorsId = response.body.data.userTrips[0].collaborators;
-
-      expect(response.status).toBe(200);
-      expect(response.body.data.userTrips.length).toBeGreaterThanOrEqual(4);
-      expect(collaboratorsId).toContain(userId);
-    });
-
-    const searchTripQuery = `query SearchTrip($searchInput: SearchTripInput!) {
+    describe("search bases destination and dates", () => {
+      const searchTripQuery = `query SearchTrip($searchInput: SearchTripInput!) {
       searchTrip(searchInput: $searchInput) {
         _id
         destination
@@ -388,70 +391,70 @@ describe("Trip", () => {
       }
     }`;
 
-    it("should search based on destination", async () => {
-      const response = await request(app.getHttpServer())
-        .post("/graphql")
-        .send({
-          query: searchTripQuery,
-          variables: {
-            searchInput: {
-              destination: "France",
+      it("should search based on destination", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .send({
+            query: searchTripQuery,
+            variables: {
+              searchInput: {
+                destination: "France",
+              },
             },
-          },
-        });
+          });
 
-      const trip = response.body.data.searchTrip[0];
-      expect(response.status).toBe(200);
-      expect(response.body.date).toBeUndefined();
-      expect(trip.destination).toBe("France");
-    });
+        const trip = response.body.data.searchTrip[0];
+        expect(response.status).toBe(200);
+        expect(response.body.date).toBeUndefined();
+        expect(trip.destination).toBe("France");
+      });
 
-    it("should search based on from date", async () => {
-      const response = await request(app.getHttpServer())
-        .post("/graphql")
-        .send({
-          query: searchTripQuery,
-          variables: {
-            searchInput: {
-              destination: "France",
-              fromDate: "2020-12-07T03:04:25.000+00:00",
+      it("should search based on from date", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .send({
+            query: searchTripQuery,
+            variables: {
+              searchInput: {
+                destination: "France",
+                fromDate: "2020-12-07T03:04:25.000+00:00",
+              },
             },
-          },
-        });
+          });
 
-      const trip = response.body.data.searchTrip[0];
-      expect(response.status).toBe(200);
-      expect(new Date(trip.fromDate).getTime()).toBeGreaterThanOrEqual(
-        new Date("2020-12-07T03:04:25.000+00:00").getTime()
-      );
-    });
+        const trip = response.body.data.searchTrip[0];
+        expect(response.status).toBe(200);
+        expect(new Date(trip.fromDate).getTime()).toBeGreaterThanOrEqual(
+          new Date("2020-12-07T03:04:25.000+00:00").getTime()
+        );
+      });
 
-    it("should search based on destination and both from date and to date", async () => {
-      const response = await request(app.getHttpServer())
-        .post("/graphql")
-        .send({
-          query: searchTripQuery,
-          variables: {
-            searchInput: {
-              destination: "France",
-              fromDate: "2020-12-07T03:04:25.000+00:00",
-              toDate: "2024-12-07T03:04:25.000+00:00",
+      it("should search based on destination and both from date and to date", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .send({
+            query: searchTripQuery,
+            variables: {
+              searchInput: {
+                destination: "France",
+                fromDate: "2020-12-07T03:04:25.000+00:00",
+                toDate: "2024-12-07T03:04:25.000+00:00",
+              },
             },
-          },
-        });
+          });
 
-      const trip = response.body.data.searchTrip[0];
-      expect(response.status).toBe(200);
-      expect(new Date(trip.fromDate).getTime()).toBeGreaterThanOrEqual(
-        new Date("2020-12-07T03:04:25.000+00:00").getTime()
-      );
-      expect(new Date(trip.toDate).getTime()).toBeLessThanOrEqual(
-        new Date("2024-12-07T03:04:25.000+00:00").getTime()
-      );
-    });
+        const trip = response.body.data.searchTrip[0];
+        expect(response.status).toBe(200);
+        expect(new Date(trip.fromDate).getTime()).toBeGreaterThanOrEqual(
+          new Date("2020-12-07T03:04:25.000+00:00").getTime()
+        );
+        expect(new Date(trip.toDate).getTime()).toBeLessThanOrEqual(
+          new Date("2024-12-07T03:04:25.000+00:00").getTime()
+        );
+      });
 
-    it("should search trips based on just dates", async () => {
-      const searchBasedDates = `query GetTripsByDateRange($dateRange: SearchTripInput!) {
+      it("should search trips based on just dates", async () => {
+        const searchBasedDates = `query GetTripsByDateRange($dateRange: SearchTripInput!) {
   getTripsByDateRange(dateRange: $dateRange) {
     _id
     destination
@@ -460,29 +463,29 @@ describe("Trip", () => {
     collaborators
   }
 }`;
-      const response = await request(app.getHttpServer())
-        .post("/graphql")
-        .send({
-          query: searchBasedDates,
-          variables: {
-            dateRange: {
-              fromDate: "2020-12-07T03:04:25.000+00:00",
-              toDate: "2024-12-07T03:04:25.000+00:00",
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .send({
+            query: searchBasedDates,
+            variables: {
+              dateRange: {
+                fromDate: "2020-12-07T03:04:25.000+00:00",
+                toDate: "2024-12-07T03:04:25.000+00:00",
+              },
             },
-          },
-        });
+          });
 
-      const trip = response.body.data.getTripsByDateRange[0];
-      expect(response.status).toBe(200);
-      expect(new Date(trip.fromDate).getTime()).toBeGreaterThanOrEqual(
-        new Date("2020-12-07T03:04:25.000+00:00").getTime()
-      );
-      expect(new Date(trip.toDate).getTime()).toBeLessThanOrEqual(
-        new Date("2024-12-07T03:04:25.000+00:00").getTime()
-      );
-    });
-    it("should give error for bad input dates", async () => {
-      const searchBasedDates = `query GetTripsByDateRange($dateRange: SearchTripInput!) {
+        const trip = response.body.data.getTripsByDateRange[0];
+        expect(response.status).toBe(200);
+        expect(new Date(trip.fromDate).getTime()).toBeGreaterThanOrEqual(
+          new Date("2020-12-07T03:04:25.000+00:00").getTime()
+        );
+        expect(new Date(trip.toDate).getTime()).toBeLessThanOrEqual(
+          new Date("2024-12-07T03:04:25.000+00:00").getTime()
+        );
+      });
+      it("should give error for bad input dates", async () => {
+        const searchBasedDates = `query GetTripsByDateRange($dateRange: SearchTripInput!) {
         getTripsByDateRange(dateRange: $dateRange) {
           _id
           destination
@@ -491,45 +494,49 @@ describe("Trip", () => {
           collaborators
         }
       }`;
-      const response = await request(app.getHttpServer())
-        .post("/graphql")
-        .send({
-          query: searchBasedDates,
-          variables: {
-            dateRange: {
-              toDate: "2020-12-07T03:04:25.000+00:00",
-              fromDate: "2024-12-07T03:04:25.000+00:00",
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .send({
+            query: searchBasedDates,
+            variables: {
+              dateRange: {
+                toDate: "2020-12-07T03:04:25.000+00:00",
+                fromDate: "2024-12-07T03:04:25.000+00:00",
+              },
             },
-          },
-        });
+          });
 
-      expect(response.status).toBe(200);
-      expect(response.body.errors[0].message).toContain(
-        "toDate date isn't correct with fromDate"
-      );
+        expect(response.status).toBe(200);
+        expect(response.body.errors[0].message).toContain(
+          "toDate date isn't correct with fromDate"
+        );
+      });
     });
-    it("should get popular destination", async () => {
-      const getPopularDestinationQuery = `query PopularDestination {
+
+    describe("popular destination", () => {
+      it("should get popular destination", async () => {
+        const getPopularDestinationQuery = `query PopularDestination {
             PopularDestination {
               tripsCount
               destination
             }
           }`;
-      const response = await request(app.getHttpServer())
-        .post("/graphql")
-        .send({
-          query: getPopularDestinationQuery,
-        });
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .send({
+            query: getPopularDestinationQuery,
+          });
 
-      const mostPopularDestination = response.body.data.PopularDestination[0];
-      const secondMostPopularDestination =
-        response.body.data.PopularDestination[1];
+        const mostPopularDestination = response.body.data.PopularDestination[0];
+        const secondMostPopularDestination =
+          response.body.data.PopularDestination[1];
 
-      expect(response.status).toBe(200);
-      expect(response.body.data.PopularDestination).toBeDefined();
-      expect(mostPopularDestination.tripsCount).toBeGreaterThanOrEqual(
-        secondMostPopularDestination.tripsCount
-      );
+        expect(response.status).toBe(200);
+        expect(response.body.data.PopularDestination).toBeDefined();
+        expect(mostPopularDestination.tripsCount).toBeGreaterThanOrEqual(
+          secondMostPopularDestination.tripsCount
+        );
+      });
     });
   });
 });
