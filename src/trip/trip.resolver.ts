@@ -15,6 +15,7 @@ import { JwtAuthGuard } from "src/auth/guards/jwt.auth.guard";
 import { GerCurrentUserId } from "src/common/get.current.userId";
 import { IsMongoId } from "class-validator";
 import { ParseObjectIdPipe } from "src/common/pipes/objectId.pipe";
+import { SearchTripInput } from "./dto/search-trip.input";
 @Resolver(() => Trip)
 export class TripResolver {
   constructor(private readonly tripService: TripService) {}
@@ -42,7 +43,12 @@ export class TripResolver {
   @Query(() => [String], { name: "collaboratorsInTrip" })
   async getCollaboratorsInTrip(@Args("id", ParseObjectIdPipe) id: string) {
     const trip = await this.tripService.findByIdOrThrow(id);
-    return trip.collaborators;;
+    return trip.collaborators;
+  }
+
+  @Query(() => [Trip], { name: "searchTrip" })
+  async search(@Args("searchInput") searchTripInput: SearchTripInput) {
+    return this.tripService.search(searchTripInput);
   }
 
   @Mutation(() => Trip)

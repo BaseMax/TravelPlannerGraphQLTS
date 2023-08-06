@@ -4,6 +4,7 @@ import { UpdateTripInput } from "./dto/update-trip.input";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { TripDocument } from "./interfaces/trip.document";
+import { SearchTripInput } from "./dto/search-trip.input";
 
 @Injectable()
 export class TripService {
@@ -29,6 +30,25 @@ export class TripService {
       throw new BadRequestException("trip with this id doesn't exist");
     }
     return trip;
+  }
+
+  async search(searchInput: SearchTripInput): Promise<TripDocument[]> {
+    const filters: any = {};
+
+    if (searchInput.destination) {
+      filters.destination = searchInput.destination;
+    }
+    if (searchInput.toDate) {
+      filters.toDate = { $lt: new Date(searchInput.toDate) };
+    }
+    if (searchInput.fromDate) {
+      filters.fromDate = { $gte: new Date(searchInput.fromDate) };
+    }
+    return this.tripModel.aggregate([
+      {
+        $match: filters,
+      },
+    ]);
   }
 
   async getUserTrips(userId: string): Promise<TripDocument[]> {
