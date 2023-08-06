@@ -44,13 +44,13 @@ describe("Trip", () => {
   }
   async function createTrip(token: string): Promise<TripDocument> {
     const createTripMutation = `mutation CreateTrip($createTripInput: CreateTripInput!) {
-    createTrip(createTripInput: $createTripInput) {
-      _id
-      destination
-      dates
-      collaborators
-    }
-  }`;
+      createTrip(createTripInput: $createTripInput) {
+        toDate
+        fromDate
+        destination
+        _id
+      }
+    }`;
 
     const response = await request(app.getHttpServer())
       .post("/graphql")
@@ -60,10 +60,8 @@ describe("Trip", () => {
         variables: {
           createTripInput: {
             destination: "France",
-            dates: [
-              "Sat Aug 05 2023 06:34:25 GMT+0330",
-              "Sat dec 07 2023 06:34:25 GMT+0330 ",
-            ],
+            fromDate: "Sat Aug 05 2023 06:34:25 GMT+0330",
+            toDate: "Sat dec 07 2023 06:34:25 GMT+0330 ",
           },
         },
       });
@@ -109,13 +107,13 @@ describe("Trip", () => {
     });
 
     const createTripMutation = `mutation CreateTrip($createTripInput: CreateTripInput!) {
-        createTrip(createTripInput: $createTripInput) {
-          _id
-          destination
-          dates
-          collaborators
-        }
-      }`;
+      createTrip(createTripInput: $createTripInput) {
+        toDate
+        fromDate
+        destination
+        _id
+      }
+    }`;
     it("should give authentication error", async () => {
       const response = await request(app.getHttpServer())
         .post("/graphql")
@@ -124,7 +122,8 @@ describe("Trip", () => {
           variables: {
             createTripInput: {
               destination: "France",
-              dates: ["2022-10-2", "2022-12-0"],
+              fromDate: "2022-10-2",
+              toDate: "2022-12-0",
               collaborators: [""],
             },
           },
@@ -145,7 +144,8 @@ describe("Trip", () => {
           variables: {
             createTripInput: {
               destination: "France",
-              dates: ["2022-10-2", "2022-12-0"],
+              fromDate: "2022-10-2",
+              toDate: "2022-9-0",
               collaborators: [""],
             },
           },
@@ -153,10 +153,14 @@ describe("Trip", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.errors[0].message).toContain(
-        "dates must be an array of valid dates."
+        "toDate date isn't correct with fromDate"
       );
       expect(response.body.errors[0].message).toContain(
         "collaborators must be an array of valid MongoDB ObjectIDs"
+      );
+
+      expect(response.body.errors[0].message).toContain(
+        "date must have a valid form"
       );
     });
 
@@ -169,10 +173,8 @@ describe("Trip", () => {
           variables: {
             createTripInput: {
               destination: "France",
-              dates: [
-                "Sat Aug 05 2023 06:34:25 GMT+0330",
-                "Sat dec 07 2023 06:34:25 GMT+0330 ",
-              ],
+              fromDate: "Sat Aug 05 2023 06:34:25 GMT+0330",
+              toDate: "Sat dec 07 2023 06:34:25 GMT+0330 ",
             },
           },
         });
@@ -192,13 +194,15 @@ describe("Trip", () => {
       trip = await createTrip(token);
     });
     it("should get validation error", async () => {
-      const findOneQuery = `query Trip($tripId: String!) {
+      const findOneQuery = ` query Trip($tripId: String!) {
         trip(id: $tripId) {
           _id
           destination
-          dates
+          fromDate
+          toDate
           collaborators
         }
+  
       }`;
       const response = await request(app.getHttpServer())
         .post("/graphql")
@@ -219,7 +223,8 @@ describe("Trip", () => {
         trip(id: $tripId) {
           _id
           destination
-          dates
+          fromDate
+          toDate
           collaborators
         }
       }`;
@@ -242,7 +247,8 @@ describe("Trip", () => {
         trip(id: $tripId) {
           _id
           destination
-          dates
+          fromDate
+          toDate
           collaborators
         }
       }`;
@@ -338,7 +344,7 @@ describe("Trip", () => {
       userTrips {
         _id
         destination
-        dates
+        toDate
         collaborators
       }
     }`;
