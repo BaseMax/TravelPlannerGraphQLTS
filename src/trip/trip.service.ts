@@ -83,6 +83,16 @@ export class TripService {
       collaborators: new mongoose.Types.ObjectId(userId),
     });
   }
+
+  async addCollaborator(userId: string, tripId: string): Promise<TripDocument> {
+    return await this.tripModel.findByIdAndUpdate(
+      tripId,
+      {
+        $push: { collaborators: userId },
+      },
+      { returnOriginal: false }
+    );
+  }
   update(id: number, updateTripInput: UpdateTripInput) {
     return `This action updates a #${id} trip`;
   }

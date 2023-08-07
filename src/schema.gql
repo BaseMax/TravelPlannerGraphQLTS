@@ -100,3 +100,7 @@ input UpdateTripInput {
   collaborators: [String!]
   id: Int!
 }
+
+type Subscription {
+  collaboratorAdded: Trip!
+}

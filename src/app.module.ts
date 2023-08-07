@@ -22,12 +22,9 @@ import { TripModule } from "./trip/trip.module";
 
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: join(process.cwd(), "src/schema.gql"),
-      playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
       driver: ApolloDriver,
-      subscriptions: {
-        "graphql-ws": true,
-      },
+      installSubscriptionHandlers: true,
+
       formatError: (error: GraphQLError) => {
         const graphQLFormattedError: GraphQLFormattedError = {
           message:
