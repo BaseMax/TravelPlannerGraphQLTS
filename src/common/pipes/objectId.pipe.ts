@@ -3,29 +3,16 @@ import {
   BadRequestException,
   PipeTransform,
 } from "@nestjs/common";
-import mongoose from "mongoose";
+import { isMongoId } from "class-validator";
+
 export class ParseObjectIdPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
-    const isValidId = this.isValidObjectId(value);
+    const isValidId = isMongoId(value);
 
     if (!isValidId) {
       throw new BadRequestException("id must be a valid objectId");
     }
 
     return value;
-  }
-
-  isValidObjectId(id: string): boolean {
-    try {
-      if (
-        mongoose.Types.ObjectId.isValid(id) &&
-        String(new mongoose.Types.ObjectId(id)) === id
-      ) {
-        return true;
-      }
-      return false;
-    } catch {
-      return false;
-    }
   }
 }
