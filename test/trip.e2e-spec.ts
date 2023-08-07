@@ -5,7 +5,7 @@ import { Model, model } from "mongoose";
 import { AppModule } from "src/app.module";
 import { User } from "src/user/entities/user.entity";
 import * as request from "supertest";
-import { getFakeUser } from "./fakeData/user.fake";
+import { getFakeUsers } from "./fakeData/user.fake";
 import { getModelToken } from "@nestjs/mongoose";
 import * as argon2 from "argon2";
 import { TripDocument } from "src/trip/interfaces/trip.document";
@@ -16,11 +16,12 @@ import { JwtPayload } from "src/auth/interfaces/jwt.payload";
 describe("Trip", () => {
   let app: INestApplication;
   let jwtService: JwtService;
-  let fakeUser: User;
+  let fakeUsers: User[];
   let tripModel: Model<any>;
   let userModel: Model<any>;
 
-  async function login(): Promise<string> {
+  async function login(userNumber: number): Promise<string> {
+    const fakeUser = getFakeUsers()[userNumber];
     const loginMutation = `mutation Login($loginInput: LoginInput!) {
             login(loginInput: $loginInput) {
               token
@@ -83,13 +84,17 @@ describe("Trip", () => {
 
     app.useGlobalPipes(new ValidationPipe());
 
-    fakeUser = getFakeUser();
+    fakeUsers = getFakeUsers();
 
     await tripModel.deleteMany({});
     await userModel.deleteMany();
     await userModel.create({
-      ...fakeUser,
-      password: await argon2.hash(fakeUser.password),
+      ...fakeUsers[0],
+      password: await argon2.hash(fakeUsers[0].password),
+    });
+    await userModel.create({
+      ...fakeUsers[1],
+      password: await argon2.hash(fakeUsers[1].password),
     });
 
     await app.init();
@@ -103,7 +108,7 @@ describe("Trip", () => {
     let token: string;
 
     beforeAll(async () => {
-      token = await login();
+      token = await login(0);
     });
 
     const createTripMutation = `mutation CreateTrip($createTripInput: CreateTripInput!) {
@@ -190,7 +195,7 @@ describe("Trip", () => {
     let token: string;
 
     beforeAll(async () => {
-      token = await login();
+      token = await login(0);
       trip = await createTrip(token);
     });
     it("should get validation error", async () => {
@@ -331,13 +336,16 @@ describe("Trip", () => {
   describe("e2e test on inserted trips", () => {
     let token: string;
     let userId: string;
+    let user2Id: string;
+    let trip: TripDocument;
     let fakeTrips: CreateTripInput[];
     beforeAll(async () => {
-      token = await login();
+      token = await login(0);
       const { sub } = jwtService.decode(token);
       userId = sub;
       fakeTrips = getFakeTrips(userId);
       await tripModel.insertMany(fakeTrips);
+      trip = await createTrip(token);
     });
 
     const getUserTripsQuery = `query UserTrips {
@@ -516,11 +524,11 @@ describe("Trip", () => {
     describe("popular destination", () => {
       it("should get popular destination", async () => {
         const getPopularDestinationQuery = `query PopularDestination {
-            PopularDestination {
-              tripsCount
-              destination
-            }
-          }`;
+          PopularDestination {
+            tripsCount
+            destination
+          }
+        }`;
         const response = await request(app.getHttpServer())
           .post("/graphql")
           .send({
@@ -535,6 +543,117 @@ describe("Trip", () => {
         expect(response.body.data.PopularDestination).toBeDefined();
         expect(mostPopularDestination.tripsCount).toBeGreaterThanOrEqual(
           secondMostPopularDestination.tripsCount
+        );
+      });
+    });
+
+    describe("add collaborators", () => {
+      const addCollaboratorMutation = `mutation AddCollaborator($tripId: String!, $userId: String!) {
+        addCollaborator(tripId: $tripId, userId: $userId) {
+          _id
+          destination
+          fromDate
+          toDate
+          collaborators
+        }
+      }
+      `;
+
+      beforeAll(async () => {
+        token = await login(1);
+        const { sub } = jwtService.decode(token);
+        user2Id = sub;
+      });
+      it("should get authentication error", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .send({
+            query: addCollaboratorMutation,
+            variables: {
+              tripId: "64cdde0c580b92480b8fe8b0",
+              userId: "64cdde0c580b92480b8fe8b2",
+            },
+          });
+
+        expect(response.body.date).toBeUndefined();
+        expect(response.body.errors[0].message).toBe(
+          "you must login to get this feather"
+        );
+      });
+
+      it("should get validation error", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .set("authorization", token)
+          .send({
+            query: addCollaboratorMutation,
+            variables: {
+              tripId: "WrongMongoId",
+              userId: "WrongMongoId",
+            },
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.body.errors[0].message).toContain(
+          "id must be a valid objectId"
+        );
+      });
+
+      it("should get  not found trip", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .set("authorization", token)
+          .send({
+            query: addCollaboratorMutation,
+            variables: {
+              tripId: "594ced02ed345b2b049222c0",
+              userId: "594ced02ed345b2b049222c3",
+            },
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.body.errors[0].message).toBe(
+          "trip with this id doesn't exist"
+        );
+      });
+
+      it("should get user not found", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .set("authorization", token)
+          .send({
+            query: addCollaboratorMutation,
+            variables: {
+              tripId: trip._id.toString(),
+              userId: "594ced02ed345b2b049222c3",
+            },
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.body.errors[0].message).toBe(
+          "there is no user with this id exists"
+        );
+      });
+
+      it("should add the user in the trip", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .set("authorization", token)
+          .send({
+            query: addCollaboratorMutation,
+            variables: {
+              tripId: trip._id.toString(),
+              userId: user2Id,
+            },
+          });
+
+        const collaborators = response.body.data.addCollaborator.collaborators;
+        expect(response.status).toBe(200);
+        expect(response.body.data).toBeTruthy();
+        expect(collaborators).toContain(user2Id);
+        expect(collaborators).toContain(userId);
+        expect(response.body.data.addCollaborator.destination).toBe(
+          trip.destination
         );
       });
     });
