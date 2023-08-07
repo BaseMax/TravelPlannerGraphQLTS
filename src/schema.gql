@@ -56,7 +56,7 @@ type Mutation {
   createTrip(createTripInput: CreateTripInput!): Trip!
   addCollaborator(tripId: String!, userId: String!): Trip!
   updateTrip(updateTripInput: UpdateTripInput!): Trip!
-  removeTrip(id: Int!): Trip!
+  removeTrip(id: String!): Trip!
 }
 
 input SignupInput {
@@ -103,4 +103,5 @@ input UpdateTripInput {
 
 type Subscription {
   collaboratorAdded: Trip!
+  tripRemoved: Trip!
 }

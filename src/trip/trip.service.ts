@@ -97,7 +97,7 @@ export class TripService {
     return `This action updates a #${id} trip`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} trip`;
+  async remove(id: string): Promise<TripDocument> {
+    return this.tripModel.findByIdAndRemove(id);
   }
 }

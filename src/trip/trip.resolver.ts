@@ -87,7 +87,7 @@ export class TripResolver {
       tripId
     );
     this.pubSub.publish("collaboratorAdded", {
-      collaboratorAdded: collaboratorAddedTrip
+      collaboratorAdded: collaboratorAddedTrip,
     });
 
     return collaboratorAddedTrip;
@@ -98,14 +98,26 @@ export class TripResolver {
     return this.tripService.update(updateTripInput.id, updateTripInput);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Mutation(() => Trip)
-  removeTrip(@Args("id", { type: () => Int }) id: number) {
-    return this.tripService.remove(id);
+  async removeTrip(@Args("id", ParseObjectIdPipe) id: string) {
+    const trip = await this.tripService.findByIdOrThrow(id);
+    const removedTrip = await this.tripService.remove(id);
+
+    this.pubSub.publish("tripRemoved", {
+      tripRemoved: removedTrip,
+    });
+
+    return removedTrip;
   }
 
   @Subscription(() => Trip)
   collaboratorAdded() {
-
     return this.pubSub.asyncIterator("collaboratorAdded");
+  }
+
+  @Subscription(() => Trip)
+  tripRemoved() {
+    return this.pubSub.asyncIterator("tripRemoved");
   }
 }
