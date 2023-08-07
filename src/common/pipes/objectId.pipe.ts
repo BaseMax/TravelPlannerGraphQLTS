@@ -17,9 +17,11 @@ export class ParseObjectIdPipe implements PipeTransform {
 
   isValidObjectId(id: string): boolean {
     try {
-      if (mongoose.Types.ObjectId.isValid(id)) {
-        if (String(new mongoose.Types.ObjectId(id)) === id) return true;
-        return false;
+      if (
+        mongoose.Types.ObjectId.isValid(id) &&
+        String(new mongoose.Types.ObjectId(id)) === id
+      ) {
+        return true;
       }
       return false;
     } catch {
