@@ -657,5 +657,76 @@ describe("Trip", () => {
         );
       });
     });
+
+    describe("remove trip", () => {
+      let trip: TripDocument;
+      beforeAll(async () => {
+        trip = await createTrip(token);
+      });
+
+      const removeTripMutation = `    mutation RemoveTrip {
+        removeTrip(id:"64d08726a580a984fb673d64" ) {
+            _id
+            destination
+            fromDate
+            toDate
+            collaborators
+        }
+    }
+`;
+      it("should give authentication error", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .send({
+            query: removeTripMutation,
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.body.date).toBeUndefined();
+        expect(response.body.errors[0].message).toBe(
+          "you must login to get this feather"
+        );
+      });
+
+      it("should get not found error", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .set("authorization", token)
+          .send({
+            query: removeTripMutation,
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.status).toBe(200);
+        expect(response.body.errors[0].message).toBe(
+          "trip with this id doesn't exist"
+        );
+      });
+      it("should delete trip softly", async () => {
+        const correctRemoveMutation = `  mutation RemoveTrip {
+          removeTrip(id: "${trip._id.toString()}" ) {
+              _id
+              destination
+              fromDate
+              toDate
+              collaborators
+          }
+      }`;
+
+        console.log(correctRemoveMutation);
+
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .set("authorization", token)
+          .send({
+            query: correctRemoveMutation,
+          });
+
+        const deletedTrip = response.body.data.removeTrip;
+        expect(response.status).toBe(200);
+        expect(response.body.errors).toBeUndefined();
+        expect(deletedTrip._id).toBe(trip._id.toString());
+      });
+    });
   });
 });
