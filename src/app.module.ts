@@ -6,9 +6,9 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { join } from "path";
 import { GraphQLError, GraphQLFormattedError } from "graphql";
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { TripModule } from './trip/trip.module';
+import { AuthModule } from "./auth/auth.module";
+import { UserModule } from "./user/user.module";
+import { TripModule } from "./trip/trip.module";
 
 @Module({
   imports: [
@@ -25,6 +25,9 @@ import { TripModule } from './trip/trip.module';
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
       driver: ApolloDriver,
+      subscriptions: {
+        "graphql-ws": true,
+      },
       formatError: (error: GraphQLError) => {
         const graphQLFormattedError: GraphQLFormattedError = {
           message:
