@@ -18,22 +18,25 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Note {
+  _id: String!
+  collaboratorId: String!
+  content: String!
+  createdAt: DateTime!
+}
+
 type Trip {
   _id: String!
   destination: String!
   fromDate: DateTime!
   toDate: DateTime!
   collaborators: [String!]!
+  notes: [Note!]!
 }
 
 type PopularDestination {
   tripsCount: Int!
   destination: String!
-}
-
-type Note {
-  """Example field (placeholder)"""
-  exampleField: Int!
 }
 
 type Query {
@@ -64,7 +67,7 @@ type Mutation {
   removeCollaborator(userId: String!, tripId: String!): Trip!
   updateTrip(updateTripInput: UpdateTripInput!): Trip!
   removeTrip(id: String!): Trip!
-  createNote(createNoteInput: CreateNoteInput!): Note!
+  createNote(createNoteInput: CreateNoteInput!): Trip!
   updateNote(updateNoteInput: UpdateNoteInput!): Note!
   removeNote(id: Int!): Note!
 }
@@ -112,13 +115,13 @@ input UpdateTripInput {
 }
 
 input CreateNoteInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  content: String!
+  tripId: String!
 }
 
 input UpdateNoteInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  content: String
+  tripId: String
   id: Int!
 }
 
@@ -126,4 +129,5 @@ type Subscription {
   collaboratorAdded: Trip!
   collaboratorRemoved: Trip!
   tripRemoved: Trip!
+  noteAdded: Trip!
 }
