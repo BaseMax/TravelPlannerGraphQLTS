@@ -93,6 +93,19 @@ export class TripService {
       { returnOriginal: false }
     );
   }
+  async removeCollaborator(
+    userId: string,
+    tripId: string
+  ): Promise<TripDocument> {
+    return await this.tripModel.findByIdAndUpdate(
+      tripId,
+      {
+        $pull: { collaborators: userId },
+      },
+      { returnOriginal: false }
+    );
+  }
+
   update(id: number, updateTripInput: UpdateTripInput) {
     return `This action updates a #${id} trip`;
   }
