@@ -126,8 +126,8 @@ input UpdateNoteInput {
 }
 
 type Subscription {
-  collaboratorAdded: Trip!
-  collaboratorRemoved: Trip!
-  tripRemoved: Trip!
-  noteAdded: Trip!
+  collaboratorAdded(tripId: String!): Trip!
+  collaboratorRemoved(tripId: String!): Trip!
+  tripRemoved(tripId: String!): Trip!
+  noteAdded(tripId: String!): Trip!
 }

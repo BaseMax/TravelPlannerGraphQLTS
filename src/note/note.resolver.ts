@@ -16,6 +16,7 @@ import { TripService } from "src/trip/trip.service";
 import { GerCurrentUserId } from "src/common/get.current.userId";
 import { Trip } from "src/trip/entities/trip.entity";
 import { PubSub } from "graphql-subscriptions";
+import { ParseObjectIdPipe } from "src/common/pipes/objectId.pipe";
 @Resolver(() => Trip)
 export class NoteResolver {
   private readonly pubSub: PubSub;
@@ -74,8 +75,12 @@ export class NoteResolver {
     return this.noteService.remove(id);
   }
 
-  @Subscription(() => Trip)
-  noteAdded() {
+  @Subscription(() => Trip, {
+    filter: (payload, variables) => {
+      return payload.noteAdded._id.toString() === variables.tripId;
+    },
+  })
+  noteAdded(@Args("tripId", ParseObjectIdPipe) tripId: string) {
     return this.pubSub.asyncIterator("noteAdded");
   }
 }

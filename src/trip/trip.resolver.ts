@@ -128,17 +128,28 @@ export class TripResolver {
     return removedTrip;
   }
 
-  @Subscription(() => Trip)
-  collaboratorAdded() {
+  @Subscription(() => Trip, {
+    filter: (payload, variables) => {      
+      return payload.collaboratorAdded._id.toString() === variables.tripId;
+    },
+  })
+  collaboratorAdded(@Args("tripId", ParseObjectIdPipe) tripId: string) {
     return this.pubSub.asyncIterator("collaboratorAdded");
   }
-  @Subscription(() => Trip)
-  collaboratorRemoved() {
+
+  @Subscription(() => Trip, {
+    filter: (payload, variables) =>
+      payload.collaboratorRemoved._id.toString() === variables.tripId,
+  })
+  collaboratorRemoved(@Args("tripId", ParseObjectIdPipe) tripId: string) {
     return this.pubSub.asyncIterator("collaboratorRemoved");
   }
 
-  @Subscription(() => Trip)
-  tripRemoved() {
+  @Subscription(() => Trip, {
+    filter: (payload, variables) =>
+      payload.tripRemoved._id.toString() === variables.tripId,
+  })
+  tripRemoved(@Args("tripId", ParseObjectIdPipe) tripId: string) {
     return this.pubSub.asyncIterator("tripRemoved");
   }
 }
