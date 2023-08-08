@@ -1,6 +1,7 @@
 import { ObjectType, Field, Int } from "@nestjs/graphql";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
+import { Note, NoteSchema } from "src/note/entities/note.entity";
 
 @Schema()
 @ObjectType()
@@ -30,6 +31,10 @@ export class Trip {
     ],
   })
   collaborators: string[];
+
+  @Field(() => [Note])
+  @Prop({ type: [{ type: NoteSchema }], required: false })
+  notes?: Note;
 }
 
 @ObjectType()

@@ -1,4 +1,5 @@
 import { Document } from "mongoose";
+import { NoteDocument } from "src/note/interfaces/note.document";
 
 export interface TripDocument extends Document {
   readonly destination: string;
@@ -8,4 +9,6 @@ export interface TripDocument extends Document {
   readonly toDate: Date;
 
   readonly collaborators: string[];
+
+  readonly notes: NoteDocument;
 }

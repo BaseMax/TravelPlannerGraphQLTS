@@ -13,5 +13,6 @@ import { UserModule } from "src/user/user.module";
     UserModule,
   ],
   providers: [TripResolver, TripService],
+  exports: [TripService],
 })
 export class TripModule {}
