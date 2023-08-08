@@ -4,12 +4,13 @@ import * as request from "supertest";
 import { AppModule } from "src/app.module";
 import { Model } from "mongoose";
 import { getModelToken } from "@nestjs/mongoose";
-import { getFakeUser } from "./fakeData/user.fake";
+import { getFakeUsers } from "./fakeData/user.fake";
 import * as argon2 from "argon2";
+import { User } from "src/user/entities/user.entity";
 describe("Auth", () => {
   let app: INestApplication;
   let userModel: Model<any>;
-  const fakeUser = getFakeUser();
+  const fakeUsers: User[] = getFakeUsers();
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -22,8 +23,8 @@ describe("Auth", () => {
 
     await userModel.deleteMany();
     await userModel.create({
-      ...fakeUser,
-      password: await argon2.hash(fakeUser.password),
+      ...fakeUsers[0],
+      password: await argon2.hash(fakeUsers[0].password),
     });
     await app.init();
   });
@@ -164,7 +165,7 @@ describe("Auth", () => {
           query: loginMutation,
           variables: {
             loginInput: {
-              email: fakeUser.email,
+              email: fakeUsers[0].email,
               password: "wrongPassword",
             },
           },
@@ -182,14 +183,14 @@ describe("Auth", () => {
           query: loginMutation,
           variables: {
             loginInput: {
-              email: fakeUser.email,
-              password: fakeUser.password,
+              email: fakeUsers[0].email,
+              password: fakeUsers[0].password,
             },
           },
         });
 
       expect(response.status).toBe(200);
-      expect(response.body.data.login.name).toBe(fakeUser.name);
+      expect(response.body.data.login.name).toBe(fakeUsers[0].name);
       expect(response.body.data.login.token).toBeTruthy();
     });
   });
