@@ -9,6 +9,7 @@ import { GraphQLError, GraphQLFormattedError } from "graphql";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { TripModule } from "./trip/trip.module";
+import { NoteModule } from './note/note.module';
 
 @Module({
   imports: [
@@ -42,6 +43,8 @@ import { TripModule } from "./trip/trip.module";
     UserModule,
 
     TripModule,
+
+    NoteModule,
   ],
   controllers: [],
   providers: [],

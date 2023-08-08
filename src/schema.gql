@@ -31,6 +31,11 @@ type PopularDestination {
   destination: String!
 }
 
+type Note {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 type Query {
   user(id: Int!): User!
   trip(id: String!): Trip!
@@ -39,6 +44,7 @@ type Query {
   searchTrip(searchInput: SearchTripInput!): [Trip!]!
   getTripsByDateRange(dateRange: SearchTripInput!): [Trip!]!
   PopularDestination: [PopularDestination!]!
+  note(id: Int!): Note!
 }
 
 input SearchTripInput {
@@ -58,6 +64,9 @@ type Mutation {
   removeCollaborator(userId: String!, tripId: String!): Trip!
   updateTrip(updateTripInput: UpdateTripInput!): Trip!
   removeTrip(id: String!): Trip!
+  createNote(createNoteInput: CreateNoteInput!): Note!
+  updateNote(updateNoteInput: UpdateNoteInput!): Note!
+  removeNote(id: Int!): Note!
 }
 
 input SignupInput {
@@ -99,6 +108,17 @@ input UpdateTripInput {
   fromDate: DateTime
   toDate: DateTime
   collaborators: [String!]
+  id: Int!
+}
+
+input CreateNoteInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateNoteInput {
+  """Example field (placeholder)"""
+  exampleField: Int
   id: Int!
 }
 
