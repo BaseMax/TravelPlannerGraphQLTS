@@ -65,9 +65,16 @@ export class NoteResolver {
     return this.noteService.findOne(id);
   }
 
-  @Mutation(() => Note)
-  updateNote(@Args("updateNoteInput") updateNoteInput: UpdateNoteInput) {
-    return this.noteService.update(updateNoteInput.id, updateNoteInput);
+  @UseGuards(JwtAuthGuard)
+  @Mutation(() => Trip)
+  async updateNote(@Args("updateNoteInput") updateNoteInput: UpdateNoteInput) {
+    const trip = await this.tripService.findByIdOrThrow(updateNoteInput.tripId);
+    const isNoteInTrip = await this.noteService.findByIdOrThrow(
+      updateNoteInput.tripId,
+      updateNoteInput.noteId
+    );
+
+    return this.noteService.updateNote(updateNoteInput)
   }
 
   @Mutation(() => Note)

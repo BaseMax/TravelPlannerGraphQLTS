@@ -68,7 +68,7 @@ type Mutation {
   updateTrip(updateTripInput: UpdateTripInput!): Trip!
   removeTrip(id: String!): Trip!
   createNote(createNoteInput: CreateNoteInput!): Trip!
-  updateNote(updateNoteInput: UpdateNoteInput!): Note!
+  updateNote(updateNoteInput: UpdateNoteInput!): Trip!
   removeNote(id: Int!): Note!
 }
 
@@ -121,8 +121,8 @@ input CreateNoteInput {
 
 input UpdateNoteInput {
   content: String
-  tripId: String
-  id: Int!
+  tripId: String!
+  noteId: String!
 }
 
 type Subscription {

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateNoteInput } from "./dto/create-note.input";
 import { UpdateNoteInput } from "./dto/update-note.input";
 import { InjectModel } from "@nestjs/mongoose";
@@ -33,16 +33,45 @@ export class NoteService {
     return trip ? true : false;
   }
 
+  async findByIdOrThrow(tripId: string, noteId: string): Promise<TripDocument> {
+    const trip = await this.tripModel.findOne({
+      _id: tripId,
+      "notes._id": noteId,
+    });
+
+    if (!trip) {
+      throw new BadRequestException(
+        "there is no note with this id in the trip"
+      );
+    }
+    return trip;
+  }
+
+  async updateNote(updateNoteInput: UpdateNoteInput): Promise<TripDocument> {
+    return await this.tripModel.findOne(
+      {
+        _id: updateNoteInput.tripId,
+        notes: {
+          $eleMatch: { _id: updateNoteInput.noteId },
+        },
+      },
+      {
+        $set: {
+          "notes.$.content": updateNoteInput.content,
+        },
+      },
+      {
+        returnOriginal: false,
+      }
+    );
+  }
+
   findAll() {
     return `This action returns all note`;
   }
 
   findOne(id: number) {
     return `This action returns a #${id} note`;
-  }
-
-  update(id: number, updateNoteInput: UpdateNoteInput) {
-    return `This action updates a #${id} note`;
   }
 
   remove(id: number) {
