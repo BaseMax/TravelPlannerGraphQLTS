@@ -671,9 +671,7 @@ describe("Trip", () => {
             fromDate
             toDate
             collaborators
-        }
-    }
-`;
+        }  }`;
       it("should give authentication error", async () => {
         const response = await request(app.getHttpServer())
           .post("/graphql")
@@ -685,6 +683,27 @@ describe("Trip", () => {
         expect(response.body.date).toBeUndefined();
         expect(response.body.errors[0].message).toBe(
           "you must login to get this feather"
+        );
+      });
+
+      it("should get validation error", async () => {
+        const response = await request(app.getHttpServer())
+          .post("/graphql")
+          .set("authorization", token)
+          .send({
+            query: `    mutation RemoveTrip {
+              removeTrip(id:"wrongMongo" ) {
+                  _id
+                  destination
+                  fromDate
+                  toDate
+                  collaborators
+              }  }`,
+          });
+
+        expect(response.status).toBe(200);
+        expect(response.body.errors[0].message).toContain(
+          "id must be a valid objectId"
         );
       });
 
@@ -713,8 +732,6 @@ describe("Trip", () => {
           }
       }`;
 
-        console.log(correctRemoveMutation);
-
         const response = await request(app.getHttpServer())
           .post("/graphql")
           .set("authorization", token)
@@ -727,6 +744,147 @@ describe("Trip", () => {
         expect(response.body.errors).toBeUndefined();
         expect(deletedTrip._id).toBe(trip._id.toString());
       });
+    });
+  });
+
+  describe("remove collaborator", () => {
+    let trip: TripDocument;
+    let userId: string;
+    let token: string;
+    beforeAll(async () => {
+      token = await login(0);
+      const { sub } = jwtService.decode(token);
+      userId = sub;
+      trip = await createTrip(token);
+    });
+
+    it("should give authentication error", async () => {
+      const removeCollaboratorMutation = `mutation RemoveCollaborator {
+        removeCollaborator(userId: "${trip._id.toString()}", tripId:"${trip._id.toString()}" ) {
+            _id
+            destination
+            fromDate
+            toDate
+            collaborators
+        }
+    }
+    `;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: removeCollaboratorMutation,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+      expect(response.body.errors[0].message).toBe(
+        "you must login to get this feather"
+      );
+    });
+
+    it("should get validation error", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: `
+          mutation RemoveCollaborator {
+            removeCollaborator(userId: "wrongMongoId", tripId:"wrongMongoId" ) {
+                _id
+                destination
+                fromDate
+                toDate
+                collaborators
+            }
+        }
+        
+      `,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+
+      expect(response.body.errors[0].message).toContain(
+        "id must be a valid objectId"
+      );
+    });
+
+    it("should get not found trip", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: `
+        mutation RemoveCollaborator {
+          removeCollaborator(userId: "${userId}", tripId:"64d0e011857198a1433b7b6d" ) {
+              _id
+              destination
+              fromDate
+              toDate
+              collaborators
+          }
+      }
+      
+    `,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+      expect(response.body.errors[0].message).toBe(
+        "trip with this id doesn't exist"
+      );
+    });
+
+    it("should get not found user", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: `
+        mutation RemoveCollaborator {
+          removeCollaborator(userId: "64d0e011857198a1433b7b6d"  tripId:"${trip._id.toString()}" ) {
+              _id
+              destination
+              fromDate
+              toDate
+              collaborators
+          }
+      }
+      
+    `,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+      expect(response.body.errors[0].message).toBe(
+        "there is no user with this id exists"
+      );
+    });
+
+    it("should remove a collaborator softly", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: `
+        mutation RemoveCollaborator {
+          removeCollaborator(userId: "${userId}", tripId:"${trip._id.toString()}" ) {
+              _id
+              destination
+              fromDate
+              toDate
+              collaborators
+          }
+      }
+      
+    `,
+        });
+
+      const { collaborators, _id } = response.body.data.removeCollaborator;
+      expect(response.status).toBe(200);
+      expect(collaborators.length).toBe(0);
+      expect(_id).toBe(trip._id.toString());
     });
   });
 });
