@@ -10,6 +10,8 @@ import { JwtService } from "@nestjs/jwt";
 import { getModelToken } from "@nestjs/mongoose";
 import { TripDocument } from "src/trip/interfaces/trip.document";
 import * as argon2 from "argon2";
+import { CreateNoteInput } from "src/note/dto/create-note.input";
+import { getFakeNotes } from "./fakeData/note.fake";
 describe("Note e2e test", () => {
   let app: INestApplication;
   let jwtService: JwtService;
@@ -69,6 +71,42 @@ describe("Note e2e test", () => {
     return response.body.data.createTrip;
   }
 
+  async function createNote(
+    token: string,
+    fakeNote: CreateNoteInput
+  ): Promise<TripDocument> {
+    const createNoteMutation = `mutation CreateNote($CreateNoteInput:CreateNoteInput!) {
+      createNote(createNoteInput: $CreateNoteInput) {
+          _id
+          notes {
+              _id
+              collaboratorId
+              content
+              createdAt
+          }
+          collaborators
+          toDate
+          fromDate
+          destination
+      }
+  }
+  `;
+
+    const response = await request(app.getHttpServer())
+      .post("/graphql")
+      .set("authorization", token)
+      .send({
+        query: createNoteMutation,
+        variables: {
+          CreateNoteInput: {
+            content: fakeNote.content,
+            tripId: fakeNote.tripId,
+          },
+        },
+      });
+
+    return response.body.data.createNote;
+  }
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, ConfigModule.forRoot()],
@@ -139,7 +177,6 @@ describe("Note e2e test", () => {
             },
           },
         });
-
 
       expect(response.status).toBe(200);
       expect(response.body.data).toBeNull();
@@ -230,6 +267,144 @@ describe("Note e2e test", () => {
       expect(response.body.errors).toBeUndefined();
       expect(response.body.data).toBeDefined();
       expect(content).toBe("test");
+    });
+  });
+
+  describe("update note", () => {
+    let token: string;
+    let trip: TripDocument;
+    let fakeNotes: CreateNoteInput[];
+    let tripAfterAddedNote: TripDocument;
+    const updateNoteMutation = `mutation UpdateNote($UpdateNoteInput : UpdateNoteInput!) {
+      updateNote(updateNoteInput: $UpdateNoteInput) {
+          _id
+      collaborators
+       notes{
+      _id
+        content
+        collaboratorId
+      }
+      destination
+      toDate
+      }
+  }
+  `;
+    beforeAll(async () => {
+      token = await login(0);
+      trip = await createTrip(token);
+      fakeNotes = getFakeNotes(trip._id.toString());
+
+      tripAfterAddedNote = await createNote(token, fakeNotes[0]);
+    });
+
+    it("should give authentication error", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: updateNoteMutation,
+          variables: {
+            UpdateNoteInput: {
+              tripId: "64d1e45d6702cb9000962ade",
+              noteId: "64d1e45d6702cb9000962ade",
+            },
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toBeNull();
+      expect(response.body.errors[0].message).toBe(
+        "you must login to get this feather"
+      );
+    });
+
+    it("should get validation error", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: updateNoteMutation,
+          variables: {
+            UpdateNoteInput: {
+              tripId: "notValidMongoId",
+              noteId: "notValidMongoId",
+            },
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toBeNull();
+      expect(response.body.errors[0].message).toContain(
+        "noteId must be a mongodb id"
+      );
+      expect(response.body.errors[0].message).toContain(
+        "tripId must be a mongodb id"
+      );
+    });
+
+    it("should get not found trip error", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: updateNoteMutation,
+          variables: {
+            UpdateNoteInput: {
+              tripId: "64d1e45d6702cb9000962ade",
+              noteId: "64d1e45d6702cb9000962ade",
+            },
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+      expect(response.body.errors[0].message).toBe(
+        "trip with this id doesn't exist"
+      );
+    });
+
+    it("should get not found note in the trip", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: updateNoteMutation,
+          variables: {
+            UpdateNoteInput: {
+              tripId: trip._id.toString(),
+              noteId: "64d1e45d6702cb9000962ade",
+            },
+          },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+      expect(response.body.errors[0].message).toBe(
+        "there is no note with this id in the trip"
+      );
+    });
+    it("should update note", async () => {
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: updateNoteMutation,
+          variables: {
+            UpdateNoteInput: {
+              tripId: trip._id.toString(),
+              noteId: tripAfterAddedNote.notes[0]._id.toString(),
+              content: "it is a updated content",
+            },
+          },
+        });
+
+      console.log(response.body.errors);
+      console.log(response.body.data);
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+      expect(response.body.errors[0].message).toBe(
+        "there is no note with this id in the trip"
+      );
     });
   });
 });
