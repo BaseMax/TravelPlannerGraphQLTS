@@ -48,20 +48,24 @@ export class NoteService {
   }
 
   async updateNote(updateNoteInput: UpdateNoteInput): Promise<TripDocument> {
-    return await this.tripModel.findOne(
+    return await this.tripModel.findOneAndUpdate(
       {
         _id: updateNoteInput.tripId,
-        notes: {
-          $eleMatch: { _id: updateNoteInput.noteId },
-        },
+        "notes._id": updateNoteInput.noteId,
       },
       {
         $set: {
-          "notes.$.content": updateNoteInput.content,
+          "notes.$[n].content": updateNoteInput.content,
         },
       },
+
       {
         returnOriginal: false,
+        arrayFilters: [
+          {
+            "n._id": new mongoose.Types.ObjectId(updateNoteInput.noteId),
+          },
+        ],
       }
     );
   }

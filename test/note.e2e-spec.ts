@@ -397,14 +397,12 @@ describe("Note e2e test", () => {
           },
         });
 
-      console.log(response.body.errors);
-      console.log(response.body.data);
 
+      const { _id, content } = response.body.data.updateNote.notes[0];
       expect(response.status).toBe(200);
       expect(response.body.date).toBeUndefined();
-      expect(response.body.errors[0].message).toBe(
-        "there is no note with this id in the trip"
-      );
+      expect(_id).toBe(tripAfterAddedNote.notes[0]._id.toString());
+      expect(content).toBe("it is a updated content");
     });
   });
 });
