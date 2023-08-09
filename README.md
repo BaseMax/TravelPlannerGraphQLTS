@@ -517,7 +517,7 @@ We welcome contributions to improve this Travel Planner App! To contribute, plea
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under the GPL-3.0 License. See the LICENSE file for more details.
 
 ## Acknowledgments
 
