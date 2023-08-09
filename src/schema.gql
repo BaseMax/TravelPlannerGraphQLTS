@@ -130,4 +130,5 @@ type Subscription {
   collaboratorRemoved(tripId: String!): Trip!
   tripRemoved(tripId: String!): Trip!
   noteAdded(tripId: String!): Trip!
+  noteUpdated(tripId: String!): Trip!
 }

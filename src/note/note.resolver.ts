@@ -74,7 +74,12 @@ export class NoteResolver {
       updateNoteInput.noteId
     );
 
-    return this.noteService.updateNote(updateNoteInput)
+    const updatedNote = await this.noteService.updateNote(updateNoteInput);
+    this.pubSub.publish("noteUpdated", {
+      noteUpdated: updatedNote,
+    });
+
+    return updatedNote;
   }
 
   @Mutation(() => Note)
@@ -89,5 +94,14 @@ export class NoteResolver {
   })
   noteAdded(@Args("tripId", ParseObjectIdPipe) tripId: string) {
     return this.pubSub.asyncIterator("noteAdded");
+  }
+
+  @Subscription(() => Trip, {
+    filter: (payload, variables) => {
+      return payload.noteUpdated._id.toString() === variables.tripId;
+    },
+  })
+  noteUpdated(@Args("tripId", ParseObjectIdPipe) tripId: string) {
+    return this.pubSub.asyncIterator("noteUpdated");
   }
 }
