@@ -70,13 +70,7 @@ export class NoteService {
     );
   }
 
-  findAll() {
-    return `This action returns all note`;
-  }
 
-  findOne(id: number) {
-    return `This action returns a #${id} note`;
-  }
 
   async remove(tripId: string, noteId: string): Promise<TripDocument> {
     return await this.tripModel.findOneAndUpdate(

@@ -47,7 +47,6 @@ type Query {
   searchTrip(searchInput: SearchTripInput!): [Trip!]!
   getTripsByDateRange(dateRange: SearchTripInput!): [Trip!]!
   PopularDestination: [PopularDestination!]!
-  note(id: Int!): Note!
 }
 
 input SearchTripInput {

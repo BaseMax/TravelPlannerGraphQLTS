@@ -55,15 +55,6 @@ export class NoteResolver {
     return tripAfterAddedNote;
   }
 
-  @Query(() => [Note], { name: "note" })
-  findAll() {
-    return this.noteService.findAll();
-  }
-
-  @Query(() => Note, { name: "note" })
-  findOne(@Args("id", { type: () => Int }) id: number) {
-    return this.noteService.findOne(id);
-  }
 
   @UseGuards(JwtAuthGuard)
   @Mutation(() => Trip)
