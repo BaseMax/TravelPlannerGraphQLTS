@@ -397,12 +397,188 @@ describe("Note e2e test", () => {
           },
         });
 
-
       const { _id, content } = response.body.data.updateNote.notes[0];
       expect(response.status).toBe(200);
       expect(response.body.date).toBeUndefined();
       expect(_id).toBe(tripAfterAddedNote.notes[0]._id.toString());
       expect(content).toBe("it is a updated content");
+    });
+  });
+
+  describe("remove a note ", () => {
+    let token: string;
+    let user2Token: string;
+    let trip: TripDocument;
+    let fakeNotes: CreateNoteInput[];
+    let tripAfterAddedNote: TripDocument;
+
+    beforeAll(async () => {
+      token = await login(0);
+      user2Token = await login(1);
+      trip = await createTrip(token);
+      fakeNotes = getFakeNotes(trip._id.toString());
+      tripAfterAddedNote = await createNote(token, fakeNotes[0]);
+    });
+
+    it("should get authentication error", async () => {
+      const removeNoteMutation = `mutation RemoveNote {
+          removeNote(tripId: "64d314d7306ec85324ee2a94", noteId: "64d314d7306ec85324ee2a94") {
+              _id
+              destination
+              fromDate
+              toDate
+              collaborators
+          }
+      }
+      `;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .send({
+          query: removeNoteMutation,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toBeNull();
+      expect(response.body.errors[0].message).toBe(
+        "you must login to get this feather"
+      );
+    });
+
+    it("should get validation error", async () => {
+      const removeNoteMutation = `mutation RemoveNote {
+        removeNote(tripId: "wrongFormat", noteId: "wrongFormat") {
+            _id
+            destination
+            fromDate
+            toDate
+            collaborators
+        }
+    }
+    `;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: removeNoteMutation,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toBeNull();
+      expect(response.body.errors[0].message).toBe(
+        "id must be a valid objectId"
+      );
+    });
+
+    it("should get not found trip", async () => {
+      const removeNoteMutation = `mutation RemoveNote {
+        removeNote(tripId: "64d314d7306ec85324ee2a94", noteId: "64d314d7306ec85324ee2a94") {
+            _id
+            destination
+            fromDate
+            toDate
+            collaborators
+        }
+    }
+    `;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: removeNoteMutation,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+      expect(response.body.errors[0].message).toBe(
+        "trip with this id doesn't exist"
+      );
+    });
+
+    it("should get not found note in the trip", async () => {
+      const removeNoteMutation = `mutation RemoveNote {
+        removeNote(tripId: "${trip._id.toString()}", noteId: "64d314d7306ec85324ee2a94") {
+            _id
+            destination
+            fromDate
+            toDate
+            collaborators
+        }
+    }
+    `;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: removeNoteMutation,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.date).toBeUndefined();
+      expect(response.body.errors[0].message).toBe(
+        "there is no note with this id in the trip"
+      );
+    });
+    it("should get not being collaborator error", async () => {
+      const removeNoteMutation = `mutation RemoveNote {
+        removeNote(tripId: "${trip._id.toString()}", noteId: "${tripAfterAddedNote.notes[0]._id.toString()}") {
+            _id
+            destination
+            fromDate
+            toDate
+            collaborators
+        }
+    }
+    `;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", user2Token)
+        .send({
+          query: removeNoteMutation,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.errors[0].message).toBe(
+        "you aren't collaborator in this trip"
+      );
+    });
+
+    it("should remove note in the trip", async () => {
+      const removeNoteMutation = `mutation RemoveNote {
+        removeNote(tripId: "${trip._id.toString()}", noteId: "${tripAfterAddedNote.notes[0]._id.toString()}") {
+            _id
+            destination
+            fromDate
+            toDate
+            collaborators
+            notes {
+              _id
+              content
+            }
+        }
+    }
+    `;
+
+      const response = await request(app.getHttpServer())
+        .post("/graphql")
+        .set("authorization", token)
+        .send({
+          query: removeNoteMutation,
+        });
+
+      const { _id, notes } = response.body.data.removeNote;
+
+      console.log(response.body.data);
+      console.log(response.body.errors);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toBeDefined();
+      expect(_id).toBe(trip._id.toString());
+      expect(notes.length).toBe(0);
     });
   });
 });
