@@ -82,9 +82,31 @@ export class NoteResolver {
     return updatedNote;
   }
 
-  @Mutation(() => Note)
-  removeNote(@Args("id", { type: () => Int }) id: number) {
-    return this.noteService.remove(id);
+  @UseGuards(JwtAuthGuard)
+  @Mutation(() => Trip)
+  async removeNote(
+    @Args("tripId", ParseObjectIdPipe) tripId: string,
+    @Args("noteId", ParseObjectIdPipe) noteId: string,
+    @GerCurrentUserId() userId: string
+  ) {
+    const trip = await this.tripService.findByIdOrThrow(tripId);
+    const noteInTrip = await this.noteService.findByIdOrThrow(tripId, noteId);
+    const isCollaborator = await this.noteService.isCollaborator(
+      userId,
+      tripId
+    );
+
+    if (!isCollaborator) {
+      throw new ForbiddenException("you aren't collaborator in this trip");
+    }
+
+    const noteRemoved = await this.noteService.remove(tripId, noteId);
+
+    this.pubSub.publish("noteRemoved", {
+      noteRemoved: noteRemoved,
+    });
+
+    return noteRemoved;
   }
 
   @Subscription(() => Trip, {
@@ -103,5 +125,14 @@ export class NoteResolver {
   })
   noteUpdated(@Args("tripId", ParseObjectIdPipe) tripId: string) {
     return this.pubSub.asyncIterator("noteUpdated");
+  }
+
+  @Subscription(() => Trip, {
+    filter: (payload, variables) => {
+      return payload.noteRemoved._id.toString() === variables.tripId;
+    },
+  })
+  noteRemoved(@Args("tripId", ParseObjectIdPipe) tripId: string) {
+    return this.pubSub.asyncIterator("noteRemoved");
   }
 }

@@ -78,7 +78,20 @@ export class NoteService {
     return `This action returns a #${id} note`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} note`;
+  async remove(tripId: string, noteId: string): Promise<TripDocument> {
+    return await this.tripModel.findOneAndUpdate(
+      {
+        _id: tripId,
+      },
+      {
+        $pull: {
+          notes: { _id: noteId },
+        },
+      },
+
+      {
+        returnOriginal: false,
+      }
+    );
   }
 }
