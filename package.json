@@ -43,7 +43,7 @@
     "rxjs": "^7.2.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "^9.0.0",
+    "@nestjs/cli": "^10.4.5",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^10.3.7",
     "@types/argon2": "^0.15.0",
